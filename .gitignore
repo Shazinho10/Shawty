@@ -39,6 +39,7 @@ ENV/
 # Output files
 shorts_output.json
 *.json.bak
+clips_json/
 
 # Temporary files
 *.tmp
@@ -53,3 +54,6 @@ Thumbs.db
 # Model cache
 .cache/
 models/
+
+# Node
+node_modules/

@@ -1,0 +1,25 @@
+{
+  "name": "shawty",
+  "version": "1.0.0",
+  "description": "A local Python application that processes video files to generate YouTube shorts by performing ASR (Automatic Speech Recognition) with timestamps and speaker diarization, then using Langchain with multiple LLM providers to analyze transcripts and select up to 5 short segments with titles and reasoning.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"(no tests)\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shazinho10/Shawty.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Shazinho10/Shawty/issues"
+  },
+  "homepage": "https://github.com/Shazinho10/Shawty#readme",
+  "devDependencies": {
+    "electron": "^40.1.0"
+  }
+}

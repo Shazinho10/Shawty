@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.screen.active {
+    display: flex;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.bg-grid-pattern {
+    background-image: radial-gradient(#0d59f2 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(12px);
+}
+
+.dark .glass-panel {
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}#dropZone.drag-over {
+    border-color: #0d59f2 !important;
+    box-shadow: 0 0 0 3px rgba(13, 89, 242, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #334155;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.video-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.video-modal.open {
+    display: flex;
+}
+
+.video-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 22, 34, 0.8);
+    backdrop-filter: blur(6px);
+}
+
+.toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: 9999px;
+    background: #e2e8f0;
+    transition: background 150ms ease;
+}
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 150ms ease;
+}
+
+.toggle.active {
+    background: #0d59f2;
+}
+
+.toggle.active::after {
+    transform: translateX(20px);
+}
+
+.dark .toggle {
+    background: #334155;
+}
+
+.advanced-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.dark .advanced-toggle {
+    color: #94a3b8;
+}
+
+.advanced-toggle .chevron {
+    transition: transform 150ms ease;
+}
+
+.advanced-toggle.open .chevron {
+    transform: rotate(180deg);
+}
+
+.advanced-content {
+    display: none;
+}
+
+.advanced-content.open {
+    display: block;
+}
+
+.raw-logs-toggle .chevron {
+    transition: transform 150ms ease;
+}
+
+.raw-logs-toggle.open .chevron {
+    transform: rotate(90deg);
+}
+
+.llm-card {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: #ffffff;
+    color: #0f172a;
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.dark .llm-card {
+    background: #1a202c;
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.llm-card:hover {
+    transform: translateY(-1px);
+}
+
+.llm-card[data-active="true"] {
+    border-color: #0d59f2;
+    box-shadow: 0 0 0 1px rgba(13, 89, 242, 0.3), 0 8px 20px rgba(13, 89, 242, 0.15);
+}
+
+.llm-card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.log-success {
+    color: #22c55e;
+}
+
+.log-warning {
+    color: #f59e0b;
+}
+
+.log-error {
+    color: #ef4444;
+}
+
+.log-info {
+    color: #60a5fa;
+}
+

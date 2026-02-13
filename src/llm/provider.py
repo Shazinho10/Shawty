@@ -33,7 +33,7 @@ def get_llm_provider(
         anthropic_key: Anthropic API key
         grok_key: Grok API key
         ollama_base_url: Ollama base URL (default: http://localhost:11434)
-        ollama_model: Ollama model name (default: deepseek-r1:1.5b)
+        ollama_model: Ollama model name (default: llama3.1:8b)
         
     Returns:
         Tuple of (LLM instance, provider type)
@@ -50,7 +50,9 @@ def get_llm_provider(
             llm = ChatOpenAI(
                 model="gpt-4o-mini",  # Using cost-effective model
                 api_key=openai_key,
-                temperature=0.7
+                temperature=0.7,
+                timeout=300,  # 5 minute timeout for long transcripts
+                max_retries=2
             )
             return llm, LLMProvider.OPENAI
         except Exception as e:
@@ -61,7 +63,9 @@ def get_llm_provider(
             llm = ChatAnthropic(
                 model="claude-3-haiku-20240307",  # Using cost-effective model
                 api_key=anthropic_key,
-                temperature=0.7
+                temperature=0.7,
+                timeout=300.0,  # 5 minute timeout for long transcripts
+                max_retries=2
             )
             return llm, LLMProvider.ANTHROPIC
         except Exception as e:
@@ -74,18 +78,22 @@ def get_llm_provider(
                 model="grok-beta",
                 api_key=grok_key,
                 base_url="https://api.x.ai/v1",
-                temperature=0.7
+                temperature=0.7,
+                timeout=300,  # 5 minute timeout for long transcripts
+                max_retries=2
             )
             return llm, LLMProvider.GROK
         except Exception as e:
             print(f"Warning: Failed to initialize Grok: {e}")
     
-    # Default to Ollama with DeepSeek
+    # Default to Ollama with Llama 3.1
     try:
         llm = ChatOllama(
             model=ollama_model,
             base_url=ollama_base_url,
-            temperature=0.7
+            temperature=0.7,
+            num_ctx=32768,  # Larger context window for long transcripts
+            timeout=600  # 10 minute timeout for local models (can be slower)
         )
         return llm, LLMProvider.OLLAMA
     except Exception as e:
