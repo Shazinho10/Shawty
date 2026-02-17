@@ -387,9 +387,15 @@ function renderShortsList(shorts, clips = []) {
         setText(elements.shortsCountBadge, `${shorts.length} clips`);
     }
 
+    const colors = ['#8B5CF6', '#F472B6', '#FBBF24', '#34D399'];
+
     shorts.forEach((short, index) => {
         const card = document.createElement('div');
-        card.className = 'group bg-white dark:bg-[#151c2b] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:border-primary/50 dark:hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/5 flex flex-col h-full';
+        const accent = colors[index % colors.length];
+        card.className = 'group bg-white rounded-2xl border-2 border-slate-200 overflow-hidden transition-all duration-200 flex flex-col h-full cursor-pointer';
+        card.style.boxShadow = `4px 4px 0px 0px ${accent}`;
+        card.onmouseenter = () => { card.style.transform = 'translate(-2px, -2px)'; card.style.boxShadow = `6px 6px 0px 0px ${accent}`; };
+        card.onmouseleave = () => { card.style.transform = 'translate(0, 0)'; card.style.boxShadow = `4px 4px 0px 0px ${accent}`; };
 
         const startTime = Number(short.start_time || 0);
         const endTime = Number(short.end_time || 0);
@@ -407,34 +413,31 @@ function renderShortsList(shorts, clips = []) {
 
         const score = short.score ?? short.viral_score ?? null;
         const scoreBadge = score ? `
-            <div class="absolute top-3 left-3 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                <span class="material-icons-round text-yellow-400 text-sm">bolt</span>
+            <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold bg-[#F472B6] text-white border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B] flex items-center gap-1">
+                <span class="material-icons-round text-sm">bolt</span>
                 ${score}/100
             </div>
         ` : '';
 
         card.innerHTML = `
-            <div class="relative aspect-video bg-gray-900 overflow-hidden">
-                <img class="clip-thumb absolute inset-0 w-full h-full object-cover opacity-90" src="file_upload.png" alt="Clip thumbnail" />
-                <div class="w-full h-full bg-gradient-to-br from-primary/30 via-transparent to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
-                <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded">
+            <div class="relative aspect-video bg-slate-100 overflow-hidden border-b-2 border-slate-200">
+                <img class="clip-thumb absolute inset-0 w-full h-full object-cover" src="file_upload.png" alt="Clip thumbnail" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute bottom-3 right-3 px-2.5 py-1 bg-white border-2 border-slate-800 rounded-full text-xs font-bold text-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
                     ${formatTime(duration)}
                 </div>
                 ${scoreBadge}
-                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-[1px]">
-                    ${hasClip ? `<button class="w-12 h-12 rounded-full bg-primary/90 text-white flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform hover:bg-primary play-clip-btn" data-clip="${clip.clipPath}" data-title="${short.title}">
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                    ${hasClip ? `<button class="w-14 h-14 rounded-full bg-white border-2 border-slate-800 text-[#8B5CF6] flex items-center justify-center shadow-[3px_3px_0px_0px_#1E293B] transform scale-75 group-hover:scale-100 transition-transform duration-200 play-clip-btn" data-clip="${clip.clipPath}" data-title="${short.title}">
                         <span class="material-icons-round text-3xl ml-1">play_arrow</span>
-                    </button>` : `<span class="text-xs text-white bg-black/60 px-3 py-1 rounded-full">Clipping...</span>`}
+                    </button>` : `<span class="text-xs text-white bg-slate-800 border-2 border-slate-600 px-3 py-1.5 rounded-full font-bold">Clipping...</span>`}
                 </div>
             </div>
             <div class="p-5 flex flex-col flex-grow">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white leading-tight line-clamp-2" contenteditable="true">${short.title}</h3>
-                </div>
-                ${short.reason ? `<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">${short.reason}</p>` : ''}
-                <div class="mt-auto flex items-center gap-2 pt-4 border-t border-gray-100 dark:border-gray-800">
-                    ${hasClip ? `<button class="flex-1 flex items-center justify-center px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary dark:text-blue-400 rounded-lg text-sm font-medium transition-colors play-clip-btn" data-clip="${clip.clipPath}" data-title="${short.title}">Preview</button>` : `<span class="text-xs text-gray-400">Preparing preview...</span>`}
+                <h3 class="font-extrabold text-base text-slate-800 leading-tight line-clamp-2 mb-1" contenteditable="true">${short.title}</h3>
+                ${short.reason ? `<p class="text-xs text-slate-500 mb-4 leading-relaxed">${short.reason}</p>` : ''}
+                <div class="mt-auto flex items-center gap-2 pt-4 border-t-2 border-slate-100">
+                    ${hasClip ? `<button class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#8B5CF6] text-white rounded-full text-sm font-bold border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B] hover:shadow-[3px_3px_0px_0px_#1E293B] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-200 play-clip-btn" data-clip="${clip.clipPath}" data-title="${short.title}"><span class="material-icons-round text-sm">play_arrow</span>Preview</button>` : `<span class="text-xs text-slate-400 font-bold">Preparing preview...</span>`}
                 </div>
             </div>
         `;

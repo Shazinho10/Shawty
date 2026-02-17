@@ -1,6 +1,5 @@
-
-<!DOCTYPE html>
-<html class="dark" lang="en">
+﻿<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -11,16 +10,18 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
-            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0d59f2",
-                        "background-light": "#f5f6f8",
-                        "background-dark": "#101622",
+                        "primary": "#8B5CF6",
+                        "secondary": "#F472B6",
+                        "tertiary": "#FBBF24",
+                        "quaternary": "#34D399",
+                        "cream": "#FFFDF5",
+                        "muted": "#F1F5F9",
                     },
                     fontFamily: {
-                        "display": ["Space Grotesk", "sans-serif"]
+                        "display": ["Outfit", "sans-serif"]
                     },
                     borderRadius: {
                         "DEFAULT": "0.25rem",
@@ -37,6 +38,7 @@
             },
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
@@ -46,679 +48,692 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen">
-    <!-- Screen 1: Idle / Upload -->
-    <section id="screen-idle" class="screen active">
-        <header class="w-full px-8 py-6 flex justify-between items-center z-10">
+<body class="bg-[#FFFDF5] text-slate-800 font-display min-h-screen relative overflow-x-hidden">
+
+    <!-- â•â•â• Screen 1: Idle / Upload â•â•â• -->
+    <section id="screen-idle" class="screen active overflow-hidden">
+        <header class="w-full px-8 py-3 flex justify-between items-center z-10 relative">
             <div class="flex items-center gap-3 group cursor-pointer">
                 <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
-                    <span class="material-icons text-white text-xl">auto_awesome</span>
+                    class="w-10 h-10 rounded-xl bg-[#8B5CF6] border-2 border-slate-800 flex items-center justify-center text-white shadow-[3px_3px_0px_0px_#1E293B] group-hover:shadow-[5px_5px_0px_0px_#1E293B] group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-all duration-200">
+                    <span class="material-icons text-xl">auto_awesome</span>
                 </div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Shawty<span
-                        class="text-primary">.ai</span></h1>
+                <h1 class="text-2xl font-extrabold tracking-tight">Shawty<span class="text-[#8B5CF6]">.ai</span></h1>
             </div>
-            
         </header>
 
-        <main class="flex-grow flex flex-col items-center justify-center relative p-6 w-full max-w-6xl mx-auto">
-            <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                <div
-                    class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl mix-blend-screen animate-pulse">
-                </div>
-                <div
-                    class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-3xl mix-blend-screen">
-                </div>
-                <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]"></div>
+        <main class="flex-grow flex flex-col items-center justify-center relative px-6 pb-4 w-full max-w-6xl mx-auto">
+            <!-- Decorative floating shapes -->
+            <div
+                class="absolute top-12 left-6 w-20 h-20 rounded-full border-[3px] border-[#F472B6] opacity-20 animate-float">
             </div>
+            <div
+                class="absolute top-8 right-[20%] w-8 h-8 border-[3px] border-[#FBBF24] opacity-25 rotate-45 animate-float-slow">
+            </div>
+            <div
+                class="absolute top-28 right-12 w-14 h-14 border-[3px] border-[#FBBF24] opacity-20 rounded-lg rotate-12 animate-float-slow">
+            </div>
+            <div class="absolute top-[40%] left-[5%] w-6 h-6 rounded-full bg-[#F472B6] opacity-10 animate-float"></div>
+            <div
+                class="absolute top-[35%] right-[8%] w-16 h-16 rounded-full border-[3px] border-[#8B5CF6] opacity-15 animate-float">
+            </div>
+            <div
+                class="absolute bottom-[45%] left-[12%] w-10 h-10 border-[3px] border-[#34D399] opacity-20 rounded-lg rotate-[30deg] animate-float-slow">
+            </div>
+            <div
+                class="absolute bottom-20 left-16 w-10 h-10 border-[3px] border-[#34D399] opacity-20 rounded rotate-45 animate-float">
+            </div>
+            <div class="absolute bottom-12 right-[15%] w-6 h-6 rounded-full bg-[#FBBF24] opacity-10 animate-float-slow">
+            </div>
+            <div
+                class="absolute bottom-32 right-24 w-24 h-24 rounded-full border-[3px] border-[#8B5CF6] opacity-10 animate-float-slow">
+            </div>
+            <div class="absolute bottom-[60%] right-[25%] w-5 h-5 bg-[#34D399] opacity-8 rotate-45 animate-float"></div>
+            <div
+                class="absolute top-[60%] left-[25%] w-12 h-12 rounded-full border-[3px] border-[#F472B6] opacity-12 animate-float-slow">
+            </div>
+            <div class="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none"></div>
 
-            <div class="text-center z-10 mb-10 max-w-2xl">
-                <h2
-                    class="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
-                    Create viral clips in seconds.
+            <div class="text-center z-10 mb-5 max-w-2xl animate-fade-in-up">
+                <h2 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight leading-[1.1]">
+                    Create <span class="text-[#8B5CF6]">viral</span> clips
+                    <br>in <span class="text-[#F472B6]">seconds</span>.
                 </h2>
-                <p class="text-lg text-slate-500 dark:text-slate-400">
+                <p class="text-base text-slate-500 max-w-md mx-auto">
                     Turn your long-form videos into engaging shorts with AI-powered editing.
                 </p>
             </div>
 
-            <div class="w-full max-w-4xl relative z-10 group">
-                <div
-                    class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-xl blur opacity-10 group-hover:opacity-30 transition duration-500">
-                </div>
+            <div class="w-full max-w-3xl relative z-10 group animate-fade-in-up" style="animation-delay: 0.1s">
                 <div id="dropZone"
-                    class="relative bg-white dark:bg-[#151c2b] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-primary dark:hover:border-primary rounded-xl p-12 md:p-20 text-center transition-all duration-300 flex flex-col items-center justify-center min-h-[400px] cursor-pointer shadow-xl shadow-black/5 dark:shadow-black/20">
-                    <div class="mb-8 relative">
+                    class="relative bg-white border-2 border-dashed border-slate-300 hover:border-[#8B5CF6] rounded-2xl p-8 md:p-10 text-center transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] cursor-pointer shadow-[6px_6px_0px_0px_#E2E8F0] hover:shadow-[8px_8px_0px_0px_#8B5CF6] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+                    <div class="mb-4 relative">
                         <div
-                            class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <span
-                                class="material-icons text-5xl text-primary transform group-hover:-translate-y-1 transition-transform duration-300">cloud_upload</span>
+                            class="w-16 h-16 rounded-2xl bg-[#8B5CF6] border-2 border-slate-800 flex items-center justify-center shadow-[3px_3px_0px_0px_#1E293B] group-hover:animate-[wiggle_0.5s_ease-in-out]">
+                            <span class="material-icons text-3xl text-white">cloud_upload</span>
                         </div>
-                        <div
-                            class="absolute inset-0 rounded-full border border-primary/20 scale-100 animate-[ping_2s_ease-in-out_infinite]">
-                        </div>
-                        <div class="absolute inset-0 rounded-full border border-primary/10 scale-125"></div>
                     </div>
-                    <h3 class="text-xl md:text-2xl font-semibold mb-3 text-slate-900 dark:text-white">
-                        Drag &amp; drop your video here
+                    <h3 class="text-lg md:text-xl font-bold mb-1">
+                        Drag & drop your video here
                     </h3>
-                    <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
-                        Support for MP4, MOV, MKV up to 2GB. <br />
-                        <span class="text-sm opacity-70">We'll analyze the best moments for you.</span>
+                    <p class="text-slate-500 mb-4 max-w-sm mx-auto text-sm">
+                        Support for MP4, MOV, MKV up to 2GB.
+                        <br><span class="text-sm opacity-70">We'll analyze the best moments for you.</span>
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 items-center w-full max-w-xs mx-auto">
-                        <button id="selectFileBtn" type="button"
-                            class="w-full py-3 px-6 bg-primary hover:bg-blue-600 text-white font-medium rounded-lg shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
-                            <span class="material-icons text-xl">folder_open</span>
-                            Browse Files
-                        </button>
-                        
-                    </div>
-
-                    </div>
-                    </div>
+                    <button id="selectFileBtn" type="button"
+                        class="btn-candy px-8 py-3 bg-[#8B5CF6] text-white text-base">
+                        <span class="material-icons text-xl">folder_open</span>
+                        Browse Files
+                    </button>
                 </div>
+            </div>
+
+            <!-- Format chips -->
+            <div class="flex gap-3 mt-4 z-10 animate-fade-in-up" style="animation-delay: 0.2s">
+                <span
+                    class="px-3 py-1 rounded-full border-2 border-slate-200 bg-white text-xs font-semibold text-slate-500 shadow-[2px_2px_0px_0px_#E2E8F0]">MP4</span>
+                <span
+                    class="px-3 py-1 rounded-full border-2 border-slate-200 bg-white text-xs font-semibold text-slate-500 shadow-[2px_2px_0px_0px_#E2E8F0]">MOV</span>
+                <span
+                    class="px-3 py-1 rounded-full border-2 border-slate-200 bg-white text-xs font-semibold text-slate-500 shadow-[2px_2px_0px_0px_#E2E8F0]">MKV</span>
             </div>
         </main>
-
-        <!-- <footer
-            class="w-full py-4 px-8 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark z-10 flex justify-between items-center text-xs text-slate-400 dark:text-slate-500">
-            <div class="flex items-center gap-4">
-                <span class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    Server Online
-                </span>
-                <span class="hidden sm:inline">|</span>
-                <span>v0.9.1 Beta</span>
-            </div>
-            <div class="flex items-center gap-6">
-                <a class="hover:text-primary transition-colors" href="#">Documentation</a>
-                <a class="hover:text-primary transition-colors" href="#">Support</a>
-                <a class="hover:text-primary transition-colors" href="#">Legal</a>
-            </div>
-        </footer> -->
     </section>
 
-    <!-- Screen 2: Selected / Setup -->
+    <!-- â•â•â• Screen 2: Selected / Setup â•â•â• -->
     <section id="screen-selected" class="screen">
         <header
-            class="h-16 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-8 bg-white dark:bg-[#101622] flex-shrink-0 z-10">
-            <div class="flex items-center gap-3">
+            class="h-12 border-b-2 border-slate-200 flex items-center justify-between px-8 bg-white flex-shrink-0 z-10">
+            <div class="flex items-center gap-2.5">
                 <div
-                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">S</div>
-                <span class="text-xl font-bold tracking-tight">Shawty</span>
+                    class="w-7 h-7 rounded-lg bg-[#8B5CF6] border-2 border-slate-800 flex items-center justify-center text-white font-bold text-xs shadow-[2px_2px_0px_0px_#1E293B]">
+                    S</div>
+                <span class="text-base font-bold tracking-tight">Shawty</span>
             </div>
-            <div class="flex items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
-                <span>Import</span>
-                <span class="material-icons text-base">chevron_right</span>
-                <span class="text-primary">Configure</span>
-                <span class="material-icons text-base">chevron_right</span>
+            <div class="flex items-center gap-3 text-xs font-semibold text-slate-400">
+                <span class="flex items-center gap-1"><span
+                        class="w-4 h-4 rounded-full bg-[#34D399] border border-slate-800 text-white text-[9px] flex items-center justify-center">✓</span>Import</span>
+                <span class="material-icons text-sm">chevron_right</span>
+                <span class="text-[#8B5CF6] flex items-center gap-1"><span
+                        class="w-4 h-4 rounded-full bg-[#8B5CF6] border border-slate-800 text-white text-[9px] flex items-center justify-center">2</span>Configure</span>
+                <span class="material-icons text-sm">chevron_right</span>
                 <span>Process</span>
             </div>
-            <div class="w-8"></div>
+            <div class="w-6"></div>
         </header>
 
-        <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
-            
-
-            
-                <div class="max-w-5xl mx-auto p-8 pb-0 space-y-6">
-                <div class="bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
-                    <div class="absolute inset-0 bg-primary/5 pointer-events-none" style="background-image: radial-gradient(circle at 0% 0%, rgba(13, 89, 242, 0.08) 0%, transparent 50%);"></div>
-                    <div class="relative z-10 space-y-6">
-                        <div class="flex items-center justify-between gap-4">
-                            <div>
-                                <h2 class="text-2xl font-bold mb-2">Selected Source</h2>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">Review details before processing</p>
-                            </div>
-                            <button id="changeFileBtn" type="button"
-                                class="px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 hover:border-primary/40 hover:text-primary transition-colors">Change</button>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-[1.1fr,1fr] gap-6">
-                            <div class="relative aspect-video rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group">
-                                <img id="selectedVideoThumbnail" alt="Selected video thumbnail" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                                    src="file_upload.png" />
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                <div id="selectedVideoPreview" class="absolute inset-0 flex items-center justify-center">
-                                    <div class="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
-                                        <span class="material-icons text-white text-3xl ml-1">play_arrow</span>
-                                    </div>
-                                </div>
-                                <div id="selectedVideoDuration"
-                                    class="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-xs font-mono font-medium text-white border border-white/10">
-                                    0:00
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 rounded-xl bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 shadow-sm">
-                                    <div class="flex items-center gap-2 mb-1 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
-                                        <span class="material-icons text-base">movie</span>
-                                        Filename
-                                    </div>
-                                    <div id="fileName" class="truncate font-mono text-sm" title="Filename">video.mp4</div>
-                                    <div id="filePath" class="truncate font-mono text-[11px] text-gray-400 mt-1" title="Full path">C:\Users\...</div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 shadow-sm">
-                                    <div class="flex items-center gap-2 mb-1 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
-                                        <span class="material-icons text-base">aspect_ratio</span>
-                                        Resolution
-                                    </div>
-                                    <div id="selectedVideoResolution" class="font-mono text-sm">Loading...</div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 shadow-sm">
-                                    <div class="flex items-center gap-2 mb-1 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
-                                        <span class="material-icons text-base">sd_storage</span>
-                                        Size
-                                    </div>
-                                    <div id="selectedVideoSize" class="font-mono text-sm">Loading...</div>
-                                </div>
-                                <div class="p-4 rounded-xl bg-white dark:bg-[#151b26] border border-gray-200 dark:border-gray-800 shadow-sm">
-                                    <div class="flex items-center gap-2 mb-1 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
-                                        <span class="material-icons text-base">graphic_eq</span>
-                                        Audio Channels
-                                    </div>
-                                    <div id="selectedVideoAudio" class="font-mono text-sm">Loading...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <main class="flex-1 flex overflow-hidden bg-[#FFFDF5] relative">
+            <!-- Decorative floating shapes -->
+            <div
+                class="absolute top-10 right-10 w-16 h-16 rounded-full border-[3px] border-[#8B5CF6] opacity-10 animate-float pointer-events-none">
+            </div>
+            <div
+                class="absolute top-[30%] left-6 w-8 h-8 border-[3px] border-[#F472B6] opacity-12 rotate-45 animate-float-slow pointer-events-none">
+            </div>
+            <div
+                class="absolute bottom-[20%] right-8 w-12 h-12 rounded-full border-[3px] border-[#FBBF24] opacity-10 animate-float pointer-events-none">
+            </div>
+            <div
+                class="absolute bottom-[40%] left-10 w-6 h-6 bg-[#34D399] opacity-8 rounded-full animate-float-slow pointer-events-none">
             </div>
 
-<div class="max-w-3xl mx-auto p-8 pb-32 space-y-10">
-                    <div class="border-b border-gray-200 dark:border-gray-800 pb-6">
-                        <h1 class="text-3xl font-bold mb-2">Configuration</h1>
-                        <p class="text-gray-600 dark:text-gray-400">Configure AI models and output settings for this
-                            session.</p>
+            <!-- â”€â”€ Left Sidebar: Video Preview â”€â”€ -->
+            <aside
+                class="w-[320px] flex-shrink-0 border-r-2 border-slate-200 bg-white p-4 flex flex-col gap-4 overflow-y-auto relative z-10">
+                <!-- Thumbnail -->
+                <div
+                    class="relative rounded-xl overflow-hidden border-2 border-slate-800 shadow-[4px_4px_0px_0px_#1E293B] group cursor-pointer">
+                    <img id="selectedVideoThumbnail" alt="Selected video thumbnail"
+                        class="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-105"
+                        src="file_upload.png" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <div id="selectedVideoPreview" class="absolute inset-0 flex items-center justify-center">
+                        <div
+                            class="w-12 h-12 rounded-full bg-white border-2 border-slate-800 flex items-center justify-center shadow-[3px_3px_0px_0px_#1E293B] group-hover:scale-110 transition-transform">
+                            <span class="material-icons text-[#8B5CF6] text-3xl ml-0.5">play_arrow</span>
+                        </div>
+                    </div>
+                    <div id="selectedVideoDuration"
+                        class="absolute bottom-2 right-2 px-2 py-0.5 bg-white border-2 border-slate-800 rounded-full text-[11px] font-bold text-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
+                        0:00
+                    </div>
+                </div>
+
+                <!-- File stats -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div
+                        class="p-3 rounded-xl bg-violet-50 border-2 border-violet-200 shadow-[2px_2px_0px_0px_#DDD6FE]">
+                        <div
+                            class="flex items-center gap-1.5 mb-0.5 text-[#8B5CF6] text-[10px] uppercase tracking-wider font-bold">
+                            <span class="material-icons text-sm">movie</span>File
+                        </div>
+                        <div id="fileName" class="truncate font-mono text-xs font-semibold" title="Filename">video.mp4
+                        </div>
+                        <div id="filePath" class="truncate font-mono text-[10px] text-slate-400 mt-0.5"
+                            title="Full path">C:\Users\...</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-pink-50 border-2 border-pink-200 shadow-[2px_2px_0px_0px_#FBCFE8]">
+                        <div
+                            class="flex items-center gap-1.5 mb-0.5 text-[#F472B6] text-[10px] uppercase tracking-wider font-bold">
+                            <span class="material-icons text-sm">aspect_ratio</span>Res
+                        </div>
+                        <div id="selectedVideoResolution" class="font-mono text-xs font-semibold">Loading...</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-50 border-2 border-amber-200 shadow-[2px_2px_0px_0px_#FDE68A]">
+                        <div
+                            class="flex items-center gap-1.5 mb-0.5 text-[#D97706] text-[10px] uppercase tracking-wider font-bold">
+                            <span class="material-icons text-sm">sd_storage</span>Size
+                        </div>
+                        <div id="selectedVideoSize" class="font-mono text-xs font-semibold">Loading...</div>
+                    </div>
+                    <div
+                        class="p-3 rounded-xl bg-emerald-50 border-2 border-emerald-200 shadow-[2px_2px_0px_0px_#A7F3D0]">
+                        <div
+                            class="flex items-center gap-1.5 mb-0.5 text-[#059669] text-[10px] uppercase tracking-wider font-bold">
+                            <span class="material-icons text-sm">graphic_eq</span>Audio
+                        </div>
+                        <div id="selectedVideoAudio" class="font-mono text-xs font-semibold">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Sidebar actions -->
+                <div class="mt-auto flex flex-col gap-2 pt-4 border-t-2 border-slate-100">
+                    <button id="changeFileBtn" type="button"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold bg-white border-2 border-slate-200 hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition-all shadow-[2px_2px_0px_0px_#E2E8F0] hover:shadow-[3px_3px_0px_0px_#8B5CF6] hover:translate-x-[-1px] hover:translate-y-[-1px]">
+                        <span class="material-icons text-base">swap_horiz</span>Change File
+                    </button>
+                    <button id="backBtn" type="button"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-slate-400 border-2 border-slate-100 hover:border-slate-300 transition-all">
+                        <span class="material-icons text-base">arrow_back</span>Back
+                    </button>
+                </div>
+            </aside>
+
+            <!-- â”€â”€ Right Panel: Configuration â”€â”€ -->
+            <div class="flex-1 overflow-hidden relative z-10 flex flex-col">
+                <div class="p-5 pb-4 flex-1 flex flex-col space-y-4">
+
+                    <div class="border-b-2 border-slate-200 pb-3">
+                        <h1 class="text-xl font-extrabold mb-0.5">Configuration</h1>
+                        <p class="text-slate-400 text-xs">Configure AI models and output settings.</p>
                     </div>
 
-                    <div class="space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-primary">Output Storage</h3>
-                        <div class="glass-panel p-6 rounded-xl">
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Destination
-                                Folder</label>
-                            <div class="flex gap-3">
-                                <div class="relative flex-1">
-                                    <span
-                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">folder_open</span>
-                                    <div
-                                        class="w-full pl-10 pr-4 py-3 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm truncate">
-                                        <span id="outputFolderPreview">Downloads/clips_json</span>
+                    <!-- Top row: Output + Transcription side by side -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Output Storage -->
+                        <div class="space-y-2">
+                            <h3
+                                class="text-xs font-extrabold uppercase tracking-wider text-[#8B5CF6] flex items-center gap-2">
+                                <span
+                                    class="w-5 h-5 rounded-md bg-[#8B5CF6] text-white flex items-center justify-center text-[10px] border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">1</span>
+                                Output Storage
+                            </h3>
+                            <div class="glass-panel p-4 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5">Destination Folder</label>
+                                    <div class="flex gap-2">
+                                        <div class="relative flex-1">
+                                            <span
+                                                class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">folder_open</span>
+                                            <div
+                                                class="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 border-2 border-slate-200 text-slate-700 font-mono text-xs truncate">
+                                                <span id="outputFolderPreview">Downloads/clips_json</span>
+                                            </div>
+                                        </div>
+                                        <button id="changeOutputBtn" type="button"
+                                            class="px-3.5 py-1.5 bg-white rounded-full font-bold text-xs border-2 border-slate-200 hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition-all shadow-[2px_2px_0px_0px_#E2E8F0] hover:shadow-[3px_3px_0px_0px_#8B5CF6] hover:translate-x-[-1px] hover:translate-y-[-1px]">
+                                            Browse
+                                        </button>
                                     </div>
                                 </div>
-                                <button id="changeOutputBtn" type="button"
-                                    class="px-6 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors text-sm border border-transparent dark:border-gray-700">
-                                    Browse
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5">Output File</label>
+                                    <div
+                                        class="w-full px-3 py-2 rounded-lg bg-slate-50 border-2 border-slate-200 text-slate-700 font-mono text-xs truncate">
+                                        <span id="outputFilePreview">video_20260205_145012.json</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transcription Engine -->
+                        <div class="space-y-2">
+                            <h3
+                                class="text-xs font-extrabold uppercase tracking-wider text-[#F472B6] flex items-center gap-2">
+                                <span
+                                    class="w-5 h-5 rounded-md bg-[#F472B6] text-white flex items-center justify-center text-[10px] border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">2</span>
+                                Transcription Engine
+                            </h3>
+                            <div class="glass-panel p-4 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5 flex justify-between">
+                                        <span>Whisper Model</span>
+                                        <span
+                                            class="text-[10px] text-[#8B5CF6] bg-violet-50 border-2 border-violet-200 px-2 py-0.5 rounded-full font-bold">Local</span>
+                                    </label>
+                                    <div class="relative">
+                                        <select id="modelSize"
+                                            class="w-full pl-3 pr-8 py-2 rounded-lg bg-slate-50 border-2 border-slate-200 text-slate-800 text-sm focus:ring-2 focus:ring-[#8B5CF6] outline-none appearance-none cursor-pointer font-medium">
+                                            <option value="tiny">Tiny (Fastest)</option>
+                                            <option value="base" selected>Base</option>
+                                            <option value="small">Small</option>
+                                            <option value="medium">Medium (Recommended)</option>
+                                            <option value="large-v2">Large v2</option>
+                                            <option value="large-v3">Large v3 (Best)</option>
+                                        </select>
+                                        <span
+                                            class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-base">expand_more</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-3 rounded-lg border-2 border-slate-200 bg-white">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-[#F472B6] border-2 border-slate-800 text-white flex items-center justify-center shadow-[2px_2px_0px_0px_#1E293B]">
+                                            <span class="material-icons text-sm">record_voice_over</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-xs">Speaker Diarization</div>
+                                            <div class="text-[10px] text-slate-500">Detect distinct speakers</div>
+                                        </div>
+                                    </div>
+                                    <div id="diarizationToggle" class="toggle" role="switch" aria-checked="false"></div>
+                                </div>
+                                <div id="hfTokenRow" class="hidden">
+                                    <label class="block text-xs font-bold mb-1.5">HuggingFace Token</label>
+                                    <input id="hfToken" type="password" placeholder="hf_..."
+                                        class="w-full pl-3 pr-3 py-2 rounded-lg bg-slate-50 border-2 border-slate-200 text-slate-800 focus:ring-2 focus:ring-[#8B5CF6] outline-none font-mono text-xs" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LLM Provider -->
+                    <div class="space-y-2">
+                        <h3
+                            class="text-xs font-extrabold uppercase tracking-wider text-[#FBBF24] flex items-center gap-2">
+                            <span
+                                class="w-5 h-5 rounded-md bg-[#FBBF24] text-white flex items-center justify-center text-[10px] border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">3</span>
+                            Content Intelligence (LLM)
+                        </h3>
+                        <div class="glass-panel p-4">
+                            <label class="block text-xs font-bold mb-2">AI Provider</label>
+                            <select id="llmProvider" class="sr-only">
+                                <option value="ollama" selected>Ollama (local)</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="anthropic">Anthropic</option>
+                                <option value="grok">Grok</option>
+                            </select>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button type="button" class="llm-card" data-provider="openai">
+                                    <div class="llm-card-inner">
+                                        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
+                                            <span class="material-icons text-lg text-slate-700">psychology</span>
+                                        </div>
+                                        <span class="text-xs">OpenAI</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="llm-card" data-provider="anthropic">
+                                    <div class="llm-card-inner">
+                                        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                                            <span class="material-icons text-lg text-orange-600">auto_awesome</span>
+                                        </div>
+                                        <span class="text-xs">Anthropic</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="llm-card" data-provider="grok">
+                                    <div class="llm-card-inner">
+                                        <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                                            <span class="material-icons text-lg text-blue-600">bolt</span>
+                                        </div>
+                                        <span class="text-xs">Grok</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="llm-card relative" data-provider="ollama">
+                                    <div
+                                        class="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-[#34D399] text-white text-[8px] font-bold border-2 border-slate-800 shadow-[1px_1px_0px_0px_#1E293B] rotate-3">
+                                        ★ LOCAL</div>
+                                    <div class="llm-card-inner">
+                                        <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                            <span class="material-icons text-lg text-emerald-600">terminal</span>
+                                        </div>
+                                        <span class="text-xs">Ollama</span>
+                                    </div>
                                 </button>
                             </div>
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-500">All generated clips and subtitle
-                                files will be saved here.</p>
-                            <div class="mt-4">
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Output
-                                    File</label>
-                                <div
-                                    class="w-full px-4 py-3 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm truncate">
-                                    <span id="outputFilePreview">video_20260205_145012.json</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-primary">Transcription Engine</h3>
-                        <div class="glass-panel p-6 rounded-xl space-y-6">
-                            <div>
-                                <label
-                                    class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300 flex justify-between">
-                                    <span>Whisper Model</span>
-                                    <span class="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">Local
-                                        Execution</span>
-                                </label>
-                                <div class="relative">
-                                    <select id="modelSize"
-                                        class="w-full pl-4 pr-10 py-3 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none appearance-none cursor-pointer">
-                                        <option value="tiny">Tiny (Fastest, Lower Accuracy)</option>
-                                        <option value="base" selected>Base</option>
-                                        <option value="small">Small</option>
-                                        <option value="medium">Medium (Recommended)</option>
-                                        <option value="large-v2">Large v2</option>
-                                        <option value="large-v3">Large v3 (Best)</option>
-                                    </select>
-                                    <span
-                                        class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">expand_more</span>
-                                </div>
-                            </div>
-
-                            <div
-                                class="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20">
-                                <div class="flex items-start gap-3">
-                                    <div class="p-2 rounded bg-primary/10 text-primary">
-                                        <span class="material-icons text-xl">record_voice_over</span>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-sm">Speaker Diarization</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Detect and label
-                                            distinct speakers (e.g., Speaker A, Speaker B)</div>
-                                    </div>
-                                </div>
-                                <div id="diarizationToggle" class="toggle" role="switch" aria-checked="false"></div>
-                            </div>
-
-                            <div id="hfTokenRow" class="hidden">
-                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">HuggingFace
-                                    Token</label>
-                                <input id="hfToken" type="password" placeholder="hf_..."
-                                    class="w-full pl-4 pr-4 py-3 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-mono text-sm" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-primary">Content Intelligence (LLM)
-                        </h3>
-                        <div class="glass-panel p-6 rounded-xl space-y-6">
-                            <div>
-                                <label class="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">AI
-                                    Provider</label>
-                                <select id="llmProvider" class="sr-only">
-                                    <option value="ollama" selected>Ollama (local)</option>
-                                    <option value="openai">OpenAI</option>
-                                    <option value="anthropic">Anthropic</option>
-                                    <option value="grok">Grok</option>
-                                </select>
-                                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                                    <button type="button" class="llm-card" data-provider="openai">
-                                        <div class="llm-card-inner">
-                                            <svg class="w-8 h-8 text-gray-900 dark:text-white" fill="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path
-                                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z">
-                                                </path>
-                                            </svg>
-                                            <span>OpenAI</span>
-                                        </div>
-                                    </button>
-                                    <button type="button" class="llm-card" data-provider="anthropic">
-                                        <div class="llm-card-inner">
-                                            <svg class="w-8 h-8 text-gray-900 dark:text-white" fill="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path
-                                                    d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z">
-                                                </path>
-                                            </svg>
-                                            <span>Anthropic</span>
-                                        </div>
-                                    </button>
-                                    <button type="button" class="llm-card" data-provider="grok">
-                                        <div class="llm-card-inner">
-                                            <svg class="w-8 h-8 text-gray-900 dark:text-white" fill="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path
-                                                    d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v5h4v2h-6V7h2z">
-                                                </path>
-                                            </svg>
-                                            <span>Grok</span>
-                                        </div>
-                                    </button>
-                                    <button type="button" class="llm-card" data-provider="ollama">
-                                        <div class="llm-card-inner">
-                                            <svg class="w-8 h-8 text-gray-900 dark:text-white" fill="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path
-                                                    d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm2 0v12h12V6H6zm2 4h8v2H8v-2zm0 4h5v2H8v-2z">
-                                                </path>
-                                            </svg>
-                                            <span>Ollama</span>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="apiKeyRow" class="hidden">
-                                <label id="apiKeyLabel"
-                                    class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">API
-                                    Key</label>
+                            <div id="apiKeyRow" class="hidden mt-3">
+                                <label id="apiKeyLabel" class="block text-xs font-bold mb-1.5">API Key</label>
                                 <div class="relative">
                                     <span
-                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">vpn_key</span>
+                                        class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">vpn_key</span>
                                     <input id="apiKey" type="password" placeholder="sk-..."
-                                        class="w-full pl-10 pr-12 py-3 rounded-lg bg-white dark:bg-[#1a202c] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-mono text-sm" />
+                                        class="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 border-2 border-slate-200 text-slate-800 focus:ring-2 focus:ring-[#8B5CF6] outline-none font-mono text-xs" />
                                 </div>
-                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
-                                    <span class="material-icons text-xs">lock</span>
-                                    Keys are stored locally and encrypted.
+                                <p class="mt-1.5 text-[10px] text-slate-400 flex items-center gap-1">
+                                    <span class="material-icons text-[10px]">lock</span>Keys are stored locally and
+                                    encrypted.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <div id="advancedToggle" class="advanced-toggle">
+                    <!-- Advanced (inline) -->
+                    <div class="space-y-1.5">
+                        <div id="advancedToggle" class="advanced-toggle text-[10px]">
                             <span class="chevron">▼</span>
                             <span>Advanced Options</span>
                         </div>
                         <div id="advancedContent" class="advanced-content">
-                            <div class="glass-panel p-6 rounded-xl space-y-6">
-                                <div class="flex items-center justify-between">
+                            <div class="glass-panel p-3 flex gap-4">
+                                <div class="flex-1 flex items-center justify-between">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Brand
-                                            File (optional)</label>
-                                        <div class="text-xs text-gray-500 dark:text-gray-500">Optional JSON config for
-                                            brand style.</div>
+                                        <label class="block text-[10px] font-bold">Brand File</label>
+                                        <div class="text-[9px] text-slate-400">Optional JSON</div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <span id="brandFilePreview"
-                                            class="text-xs text-gray-500 dark:text-gray-400">None</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span id="brandFilePreview" class="text-[9px] text-slate-400">None</span>
                                         <button id="selectBrandBtn" type="button"
-                                            class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-sm font-medium">Select</button>
+                                            class="px-2 py-1 rounded-full bg-white border border-slate-200 hover:border-[#8B5CF6] text-[10px] font-bold transition-all">Select</button>
                                     </div>
                                 </div>
-
-                                <div class="flex items-center justify-between">
+                                <div class="w-px bg-slate-200"></div>
+                                <div class="flex items-center justify-between gap-3">
                                     <div>
-                                        <label
-                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Auto-open
-                                            folder on complete</label>
-                                        <div class="text-xs text-gray-500 dark:text-gray-500">Open output folder after
-                                            conversion.</div>
+                                        <label class="block text-[10px] font-bold">Auto-open</label>
+                                        <div class="text-[9px] text-slate-400">On completion</div>
                                     </div>
-                                    <div id="autoOpenToggle" class="toggle active" role="switch" aria-checked="true"></div>
+                                    <div id="autoOpenToggle" class="toggle active" role="switch" aria-checked="true">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div
-                    class="mt-12 mb-10 p-6 bg-white/90 dark:bg-[#101622]/90 backdrop-blur-xl border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <button id="backBtn" type="button"
-                        class="flex items-center gap-2 px-6 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium">
-                        <span class="material-icons text-lg">arrow_back</span>
-                        Back to Library
-                    </button>
-                    <div class="flex items-center gap-4">
-                        <div class="text-right hidden sm:block">
-                            <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Est. Processing
-                                Time</div>
-                            <div class="font-mono text-sm text-gray-800 dark:text-gray-200">~12 minutes</div>
+                    <!-- Action bar -->
+                    <div class="mt-auto flex items-center justify-between pt-4 border-t-2 border-slate-200">
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Est. Time</div>
+                            <div class="font-mono text-sm font-semibold">~12 min</div>
                         </div>
                         <button id="convertBtn" type="button"
-                            class="flex items-center gap-2 px-8 py-3 rounded-lg bg-primary hover:bg-blue-600 text-white shadow-lg shadow-primary/30 transition-all transform active:scale-95 font-bold">
+                            class="btn-candy px-8 py-3 bg-[#8B5CF6] text-white text-base">
                             <span class="material-icons">auto_awesome</span>
                             Start Conversion
                         </button>
                     </div>
                 </div>
-            
+            </div>
         </main>
     </section>
 
-    <!-- Screen 3: Processing -->
+
+    <!-- â•â•â• Screen 3: Processing â•â•â• -->
     <section id="screen-processing" class="screen">
-        <nav class="w-full px-8 py-6 flex justify-between items-center fixed top-0 left-0 z-50">
+        <nav class="w-full px-8 py-5 flex justify-between items-center z-50 bg-white border-b-2 border-slate-200">
             <div class="flex items-center gap-2">
                 <div
-                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/20">
+                    class="w-8 h-8 rounded-lg bg-[#8B5CF6] border-2 border-slate-800 flex items-center justify-center shadow-[2px_2px_0px_0px_#1E293B]">
                     <span class="material-icons text-white text-lg">movie_filter</span>
                 </div>
                 <span class="text-xl font-bold tracking-tight">Shawty</span>
             </div>
-            <div class="flex items-center gap-4">
-                <div
-                    class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#1a2234] border border-gray-200 dark:border-white/10 text-xs font-medium text-gray-500 dark:text-gray-400">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    Processing Job #8821
-                </div>
-                
+            <div
+                class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border-2 border-slate-200 text-xs font-bold text-slate-400 shadow-[2px_2px_0px_0px_#E2E8F0]">
+                <span class="w-2 h-2 rounded-full bg-[#34D399] animate-pulse"></span>
+                Processing...
             </div>
         </nav>
 
         <main
-            class="flex-grow flex flex-col items-center justify-start relative px-4 sm:px-6 w-full max-w-7xl mx-auto min-h-screen pt-16 pb-12">
+            class="flex-grow flex flex-col items-center justify-start relative px-4 sm:px-6 w-full max-w-3xl mx-auto pt-12 pb-12">
+            <!-- Decorative floating shapes -->
             <div
-                class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none mix-blend-screen opacity-50 animate-pulse">
+                class="absolute top-20 left-4 w-16 h-16 rounded-full border-[3px] border-[#F472B6] opacity-15 animate-float">
             </div>
             <div
-                class="absolute bottom-1/4 -right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-40">
+                class="absolute top-40 right-8 w-10 h-10 border-[3px] border-[#FBBF24] opacity-15 rounded-lg rotate-12 animate-float-slow">
+            </div>
+            <div class="absolute top-[30%] right-[15%] w-8 h-8 rounded-full bg-[#8B5CF6] opacity-8 animate-float"></div>
+            <div
+                class="absolute top-[50%] left-[8%] w-6 h-6 border-[3px] border-[#8B5CF6] opacity-15 rotate-45 animate-float-slow">
+            </div>
+            <div
+                class="absolute bottom-[40%] right-[10%] w-14 h-14 rounded-full border-[3px] border-[#34D399] opacity-12 animate-float">
+            </div>
+            <div
+                class="absolute bottom-20 left-8 w-12 h-12 border-[3px] border-[#34D399] opacity-10 rounded rotate-45 animate-float">
+            </div>
+            <div
+                class="absolute bottom-[30%] right-[25%] w-5 h-5 bg-[#F472B6] opacity-10 rounded-full animate-float-slow">
+            </div>
+            <div
+                class="absolute top-[65%] left-[20%] w-10 h-10 border-[3px] border-[#FBBF24] opacity-12 rounded-full animate-float">
             </div>
 
-            <div class="w-full max-w-2xl flex flex-col items-center z-10 space-y-6">
-                <div class="relative flex flex-col items-center justify-center">
-                    <div class="relative w-64 h-64 sm:w-80 sm:h-80">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle class="text-gray-200 dark:text-white/5" cx="50" cy="50" r="45" fill="none"
-                                stroke="currentColor" stroke-width="6"></circle>
-                            <circle id="processingProgressCircle"
-                                class="text-primary drop-shadow-[0_0_15px_rgba(13,89,242,0.5)] transition-all duration-1000 ease-out"
-                                cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-dasharray="282.7"
-                                stroke-dashoffset="282.7" stroke-linecap="round" stroke-width="6"
-                                data-circumference="282.7"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                            <span id="processingPercent"
-                                class="text-6xl sm:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 dark:from-white dark:to-gray-400">0%</span>
-                            <div class="mt-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-                                <span id="processingStage"
-                                    class="text-sm font-medium text-primary dark:text-blue-400 animate-pulse">Initializing...</span>
-                            </div>
+            <div class="flex flex-col items-center z-10 space-y-8 w-full">
+                <!-- Progress ring -->
+                <div
+                    class="relative w-56 h-56 sm:w-64 sm:h-64 bg-white border-2 border-slate-200 rounded-full shadow-[6px_6px_0px_0px_#E2E8F0] flex items-center justify-center">
+                    <svg class="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle class="text-slate-100" cx="50" cy="50" r="42" fill="none" stroke="currentColor"
+                            stroke-width="6"></circle>
+                        <circle id="processingProgressCircle"
+                            class="text-[#8B5CF6] transition-all duration-1000 ease-out" cx="50" cy="50" r="42"
+                            fill="none" stroke="currentColor" stroke-dasharray="263.9" stroke-dashoffset="263.9"
+                            stroke-linecap="round" stroke-width="6" data-circumference="263.9"></circle>
+                    </svg>
+                    <div class="flex flex-col items-center justify-center text-center">
+                        <span id="processingPercent"
+                            class="text-5xl sm:text-6xl font-extrabold tracking-tighter text-slate-800">0%</span>
+                        <div
+                            class="mt-1 px-3 py-1 rounded-full bg-violet-50 border-2 border-violet-200 shadow-[2px_2px_0px_0px_#DDD6FE]">
+                            <span id="processingStage" class="text-xs font-bold text-[#8B5CF6]">Initializing...</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="w-full relative group">
+                <!-- System Logs -->
+                <div class="w-full">
                     <div
-                        class="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-[#1a2234] border-x border-t border-gray-200 dark:border-white/10 rounded-t-xl">
+                        class="flex items-center justify-between px-4 py-2.5 bg-white border-2 border-slate-200 border-b-0 rounded-t-xl">
                         <div class="flex items-center gap-2">
-                            <span class="material-icons text-gray-400 text-sm">terminal</span>
-                            <span class="text-xs font-mono text-gray-500 dark:text-gray-400 uppercase tracking-widest">System
-                                Logs</span>
+                            <span class="material-icons text-slate-400 text-sm">terminal</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">System Logs</span>
                         </div>
                         <div class="flex gap-1.5">
-                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/50"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#F472B6] border-2 border-slate-800"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#FBBF24] border-2 border-slate-800"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#34D399] border-2 border-slate-800"></div>
                         </div>
                     </div>
                     <div
-                        class="h-48 overflow-y-auto bg-white dark:bg-[#0b0f17] border border-gray-200 dark:border-white/10 rounded-b-xl p-4 font-mono text-sm leading-relaxed shadow-inner custom-scrollbar relative">
-                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none z-10"></div>
-                        <div id="logsContent" class="flex flex-col gap-2 relative z-0"></div>
-                    </div>
-                    <div
-                        class="absolute -inset-0.5 bg-gradient-to-r from-primary to-purple-600 rounded-xl blur opacity-10 group-hover:opacity-20 transition duration-1000 -z-10">
+                        class="h-48 overflow-y-auto bg-white border-2 border-slate-200 rounded-b-xl p-4 font-mono text-sm leading-relaxed shadow-[4px_4px_0px_0px_#E2E8F0] custom-scrollbar">
+                        <div id="logsContent" class="flex flex-col gap-2"></div>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-center w-full">
-                    <button id="cancelBtn" type="button"
-                        class="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-500 text-gray-500 dark:text-gray-400 text-sm font-medium transition-all flex items-center gap-2 group">
-                        <span class="material-icons text-base group-hover:text-red-500 transition-colors">close</span>
-                        Cancel Generation
-                    </button>
-                </div>
+                <button id="cancelBtn" type="button"
+                    class="px-6 py-2.5 rounded-full border-2 border-slate-200 bg-white hover:border-red-400 hover:text-red-500 text-slate-400 text-sm font-bold transition-all shadow-[3px_3px_0px_0px_#E2E8F0] hover:shadow-[3px_3px_0px_0px_#FCA5A5] hover:translate-x-[-1px] hover:translate-y-[-1px] flex items-center gap-2">
+                    <span class="material-icons text-base">close</span>
+                    Cancel
+                </button>
             </div>
         </main>
-
-        <div class="fixed inset-0 pointer-events-none -z-10 opacity-[0.03]"
-            style="background-image: linear-gradient(to right, #808080 1px, transparent 1px), linear-gradient(to bottom, #808080 1px, transparent 1px); background-size: 40px 40px;">
-        </div>
     </section>
 
-    <!-- Screen 4: Completed -->
+    <!-- â•â•â• Screen 4: Completed â•â•â• -->
     <section id="screen-completed" class="screen">
-        <nav
-            class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <nav class="sticky top-0 z-50 border-b-2 border-slate-200 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center gap-3">
                         <div
-                            class="w-8 h-8 rounded bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20">
-                            <span class="material-icons-round text-white text-lg">movie_filter</span>
+                            class="w-8 h-8 rounded-lg bg-[#34D399] border-2 border-slate-800 flex items-center justify-center shadow-[2px_2px_0px_0px_#1E293B]">
+                            <span class="material-icons-round text-white text-lg">check</span>
                         </div>
                         <span class="text-xl font-bold tracking-tight">Shawty</span>
-                    </div>
-                    <div></div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-            <div class="mb-10 animate-fade-in-up">
+        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full relative">
+            <!-- Decorative floating shapes -->
+            <div
+                class="absolute top-8 right-12 w-18 h-18 rounded-full border-[3px] border-[#34D399] opacity-12 animate-float pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute top-[25%] left-4 w-8 h-8 border-[3px] border-[#F472B6] opacity-15 rotate-45 animate-float-slow pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute top-[50%] right-6 w-10 h-10 rounded-full border-[3px] border-[#FBBF24] opacity-10 animate-float pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute bottom-[15%] left-8 w-6 h-6 bg-[#8B5CF6] opacity-8 rounded-full animate-float-slow pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute top-[40%] right-[25%] w-14 h-14 border-[3px] border-[#8B5CF6] opacity-8 rounded-lg rotate-12 animate-float pointer-events-none z-0">
+            </div>
+            <div
+                class="absolute bottom-[35%] left-[10%] w-12 h-12 rounded-full border-[3px] border-[#34D399] opacity-10 animate-float-slow pointer-events-none z-0">
+            </div>
+            <div class="mb-10 animate-fade-in-up relative z-10">
                 <div
-                    class="bg-white dark:bg-[#151c2b] border border-gray-200 dark:border-gray-800 rounded-xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none">
-                    </div>
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+                    class="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0px_0px_#A7F3D0] relative overflow-hidden">
+                    <div
+                        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
                         <div class="flex items-start gap-4">
                             <div
-                                class="w-12 h-12 rounded-full bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center flex-shrink-0 border border-green-500/30">
-                                <span class="material-icons-round text-green-600 dark:text-green-400 text-2xl">check_circle</span>
+                                class="w-14 h-14 rounded-xl bg-[#34D399] border-2 border-slate-800 flex items-center justify-center flex-shrink-0 shadow-[3px_3px_0px_0px_#1E293B] animate-pop-in">
+                                <span class="material-icons-round text-white text-3xl">celebration</span>
                             </div>
                             <div>
-                                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Processing Complete!
-                                </h1>
-                                <p class="text-gray-500 dark:text-gray-400">We successfully generated <span
-                                        class="text-primary font-semibold">shorts</span> from your source video.</p>
+                                <h1 class="text-2xl font-extrabold mb-1">Processing Complete! &#127881;</h1>
+                                <p class="text-slate-500">We successfully generated <span
+                                        class="text-[#8B5CF6] font-bold">shorts</span> from your source video.</p>
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <button id="openFolderBtn" type="button"
-                                class="inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50">
-                                <span class="material-icons-round text-lg mr-2">folder_open</span>
-                                Open Folder
+                                class="inline-flex items-center justify-center px-5 py-2.5 rounded-full border-2 border-slate-200 text-sm font-bold text-slate-600 bg-white hover:border-[#8B5CF6] hover:text-[#8B5CF6] transition-all shadow-[3px_3px_0px_0px_#E2E8F0] hover:shadow-[4px_4px_0px_0px_#8B5CF6] hover:translate-x-[-1px] hover:translate-y-[-1px]">
+                                <span class="material-icons-round text-lg mr-2">folder_open</span>Open Folder
                             </button>
                             <button id="convertAnotherBtn" type="button"
-                                class="inline-flex items-center justify-center px-4 py-2.5 bg-primary hover:bg-blue-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-primary/25 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-gray-900">
-                                <span class="material-icons-round text-lg mr-2">add_circle_outline</span>
-                                Convert Another
+                                class="btn-candy px-6 py-2.5 bg-[#8B5CF6] text-white text-sm">
+                                <span class="material-icons-round text-lg">add_circle_outline</span>Convert Another
                             </button>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex flex-col sm:flex-row gap-3 items-center">
-                        <div class="text-sm font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">Output
-                            Path:</div>
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3 items-center">
+                        <div class="text-sm font-bold text-slate-500 whitespace-nowrap">Output Path:</div>
                         <div class="relative flex-grow w-full">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span class="material-icons-round text-gray-400 text-sm">folder</span>
+                                <span class="material-icons-round text-slate-400 text-sm">folder</span>
                             </div>
                             <div
-                                class="block w-full pl-9 pr-12 py-2.5 sm:text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 font-mono cursor-text select-all truncate">
+                                class="block w-full pl-9 pr-4 py-2.5 text-sm bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-600 font-mono truncate">
                                 <span id="completedOutputPath">/path/to/output.json</span>
                             </div>
-                            <button type="button"
-                                class="absolute inset-y-1 right-1 px-3 flex items-center bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary rounded-md border border-gray-200 dark:border-gray-700 transition-colors shadow-sm"
-                                title="Copy Path">
-                                <span class="material-icons-round text-sm">content_copy</span>
-                            </button>
                         </div>
                         <button id="openJsonBtn" type="button"
-                            class="hidden sm:inline-flex items-center justify-center px-3 py-2.5 border border-transparent rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary hover:bg-primary/5 transition-colors">
-                            <span class="material-icons-round text-lg mr-1">data_object</span>
-                            View JSON
+                            class="hidden sm:inline-flex items-center justify-center px-4 py-2.5 rounded-full border-2 border-slate-200 text-sm font-bold text-slate-500 hover:text-[#8B5CF6] hover:border-[#8B5CF6] transition-all">
+                            <span class="material-icons-round text-lg mr-1">data_object</span>JSON
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Generated Shorts</h2>
-                        <span id="shortsCountBadge"
-                            class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                            0 clips
-                        </span>
-                    </div>
+            <div class="space-y-6 relative z-10">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-xl font-extrabold">Generated Shorts</h2>
+                    <span id="shortsCountBadge"
+                        class="px-3 py-0.5 rounded-full text-xs font-bold bg-violet-50 text-[#8B5CF6] border-2 border-violet-200 shadow-[2px_2px_0px_0px_#DDD6FE]">
+                        0 clips
+                    </span>
                 </div>
-
                 <div id="shortsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <div class="mt-8">
+            <div class="mt-8 relative z-10">
                 <button id="rawLogsToggle" type="button"
-                    class="raw-logs-toggle flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                    <span class="chevron">▶</span>
-                    Show full logs
+                    class="raw-logs-toggle flex items-center gap-2 text-sm text-slate-500 font-bold">
+                    <span class="chevron">â–¶</span>Show full logs
                 </button>
                 <div id="rawLogsPanel"
-                    class="hidden mt-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#151c2b] p-4 custom-scrollbar">
-                    <pre id="rawLogsContent" class="text-xs font-mono text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></pre>
+                    class="hidden mt-3 rounded-xl border-2 border-slate-200 bg-white p-4 custom-scrollbar shadow-[3px_3px_0px_0px_#E2E8F0]">
+                    <pre id="rawLogsContent" class="text-xs font-mono text-slate-600 whitespace-pre-wrap"></pre>
                 </div>
             </div>
         </main>
     </section>
 
-    <!-- Clip Preview Modal -->
+    <!-- â•â•â• Clip Preview Modal â•â•â• -->
     <div id="videoModal" class="video-modal">
         <div id="videoModalOverlay" class="video-modal-overlay"></div>
         <div
-            class="w-full max-w-5xl bg-white dark:bg-[#151c2c] border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden max-h-[90vh] relative z-50">
-                <div class="relative w-full md:w-5/12 lg:w-4/12 bg-black flex items-center justify-center group shrink-0">
-                    <div class="relative w-full h-full flex items-center justify-center bg-zinc-900" style="aspect-ratio: 9/16;">
-                        <img id="clipThumbnail" alt="Clip thumbnail" class="absolute inset-0 w-full h-full object-cover" />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                        <div class="absolute bottom-3 left-3 right-3 text-xs text-white/80 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg">
-                            Opening in your default video player…
-                        </div>
+            class="w-full max-w-5xl bg-white border-2 border-slate-800 rounded-2xl shadow-[8px_8px_0px_0px_#1E293B] flex flex-col md:flex-row overflow-hidden max-h-[90vh] relative z-50">
+            <div
+                class="relative w-full md:w-5/12 lg:w-4/12 bg-slate-900 flex items-center justify-center group shrink-0">
+                <div class="relative w-full h-full flex items-center justify-center bg-slate-900"
+                    style="aspect-ratio: 9/16;">
+                    <img id="clipThumbnail" alt="Clip thumbnail" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    <div
+                        class="absolute bottom-3 left-3 right-3 text-xs text-white/80 bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg">
+                        Opening in your default video playerâ€¦
                     </div>
                 </div>
-            <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#151c2c] h-full">
-                <div class="p-6 border-b border-slate-200 dark:border-slate-700/50 flex justify-between items-start gap-4">
+            </div>
+            <div class="flex-1 flex flex-col min-w-0 bg-white h-full">
+                <div class="p-6 border-b-2 border-slate-200 flex justify-between items-start gap-4">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-3 mb-2">
                             <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                                <span class="w-1.5 h-1.5 bg-primary rounded-full mr-1.5 animate-pulse"></span>
-                                Viral Score: 92/100
+                                class="px-3 py-1 rounded-full text-xs font-bold bg-[#F472B6] text-white border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
+                                â˜… Viral Score: 92
                             </span>
-                            <span class="text-xs text-slate-500 dark:text-slate-400">Generated 2 mins ago</span>
+                            <span class="text-xs text-slate-400 font-medium">Generated 2 mins ago</span>
                         </div>
                         <input id="videoModalTitle" type="text"
-                            class="block w-full text-2xl font-bold bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-primary focus:ring-0 px-0 py-1 text-slate-900 dark:text-white placeholder-slate-400 transition-all truncate"
+                            class="block w-full text-2xl font-extrabold bg-transparent border-0 border-b-2 border-transparent hover:border-slate-200 focus:border-[#8B5CF6] focus:ring-0 px-0 py-1 text-slate-800 placeholder-slate-300 transition-all truncate"
                             placeholder="Enter clip title..." />
                     </div>
                     <button id="videoModalClose" type="button"
-                        class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
-                        <span class="material-icons-round text-2xl">close</span>
+                        class="w-10 h-10 rounded-full border-2 border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:border-red-400 hover:text-red-500 hover:bg-red-50 transition-all shadow-[2px_2px_0px_0px_#E2E8F0]">
+                        <span class="material-icons-round text-xl">close</span>
                     </button>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     <div class="space-y-3">
-                        <h3
-                            class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                            <span class="material-icons-round text-base text-primary">auto_awesome</span>
-                            AI Analysis
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <span class="material-icons-round text-base text-[#8B5CF6]">auto_awesome</span>AI Analysis
                         </h3>
-                        <div class="bg-primary/5 dark:bg-primary/5 border border-primary/10 rounded-xl p-4">
-                            <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                <strong class="text-primary block mb-1">High Engagement Potential</strong>
+                        <div
+                            class="bg-violet-50 border-2 border-violet-200 rounded-xl p-4 shadow-[3px_3px_0px_0px_#DDD6FE]">
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                <strong class="text-[#8B5CF6] block mb-1">High Engagement Potential</strong>
                                 This clip captures a strong hook and keeps momentum through the key insight.
                             </p>
                         </div>
                     </div>
 
                     <div class="space-y-3">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Target
-                            Platforms</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Target Platforms</h3>
                         <div class="flex flex-wrap gap-2">
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-[#F472B6] text-white border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
                                 <span class="material-icons-round text-sm">tiktok</span> TikTok
                             </span>
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                                <span class="material-icons-round text-sm">smart_display</span> YouTube Shorts
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-red-500 text-white border-2 border-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
+                                <span class="material-icons-round text-sm">smart_display</span> YouTube
                             </span>
                         </div>
                     </div>
                 </div>
-
-                </div>
-        </div>
+            </div>
         </div>
     </div>
 
@@ -726,8 +741,3 @@
 </body>
 
 </html>
-
-
-
-
-

@@ -1,4 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* ── Palette 2: Playful Geometric ── */
+:root {
+    --bg: #FFFDF5;
+    --fg: #1E293B;
+    --muted: #64748B;
+    --primary: #8B5CF6;
+    --secondary: #F472B6;
+    --tertiary: #FBBF24;
+    --quaternary: #34D399;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --input: #F1F5F9;
+
+    /* Hard shadows */
+    --shadow-sm: 3px 3px 0px 0px var(--border);
+    --shadow-md: 4px 4px 0px 0px var(--fg);
+    --shadow-lg: 6px 6px 0px 0px var(--fg);
+    --shadow-color: 4px 4px 0px 0px var(--primary);
+    --shadow-pink: 4px 4px 0px 0px var(--secondary);
+    --shadow-amber: 4px 4px 0px 0px var(--tertiary);
+    --shadow-mint: 4px 4px 0px 0px var(--quaternary);
+}
 
 * {
     box-sizing: border-box;
@@ -7,9 +31,12 @@
 }
 
 body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
 }
 
+/* ── Layout ── */
 .screen {
     display: none;
     min-height: 100vh;
@@ -20,30 +47,44 @@ body {
     display: flex;
 }
 
+#screen-selected {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
 .hidden {
     display: none !important;
 }
 
+/* ── Dot grid background ── */
 .bg-grid-pattern {
-    background-image: radial-gradient(#0d59f2 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-image: radial-gradient(#8B5CF6 1px, transparent 1px);
+    background-size: 32px 32px;
 }
 
-
+/* ── Glass panel — now "sticker card" ── */
 .glass-panel {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    backdrop-filter: blur(12px);
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
-.dark .glass-panel {
-    background: rgba(31, 41, 55, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}#dropZone.drag-over {
-    border-color: #0d59f2 !important;
-    box-shadow: 0 0 0 3px rgba(13, 89, 242, 0.15);
+.glass-panel:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px var(--border);
 }
 
+/* ── Drop zone states ── */
+#dropZone.drag-over {
+    border-color: var(--primary) !important;
+    box-shadow: var(--shadow-color) !important;
+    transform: translate(-2px, -2px);
+}
+
+/* ── Scrollbar ── */
 .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -54,37 +95,95 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: #CBD5E1;
     border-radius: 20px;
 }
 
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #334155;
-}
-
+/* ── Utility ── */
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease both;
+    animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(16px) scale(0.97);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
+/* ── Pop-in animation ── */
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-pop-in {
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Wiggle animation for icons ── */
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(3deg);
+    }
+
+    75% {
+        transform: rotate(-3deg);
+    }
+}
+
+/* ── Float animation for decorative shapes ── */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(3deg);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+    animation: float 10s ease-in-out infinite;
+}
+
+/* ── Video modal ── */
 .video-modal {
     position: fixed;
     inset: 0;
@@ -101,61 +200,73 @@ body {
 .video-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(16, 22, 34, 0.8);
-    backdrop-filter: blur(6px);
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(8px);
 }
 
+/* ── Toggle — candy pill ── */
 .toggle {
     position: relative;
-    width: 44px;
-    height: 24px;
+    width: 48px;
+    height: 26px;
     border-radius: 9999px;
-    background: #e2e8f0;
-    transition: background 150ms ease;
+    background: #E2E8F0;
+    border: 2px solid #CBD5E1;
+    cursor: pointer;
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .toggle::after {
     content: '';
     position: absolute;
-    top: 3px;
-    left: 3px;
+    top: 2px;
+    left: 2px;
     width: 18px;
     height: 18px;
     border-radius: 9999px;
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    transition: transform 150ms ease;
+    border: 2px solid #CBD5E1;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .toggle.active {
-    background: #0d59f2;
+    background: var(--primary);
+    border-color: var(--fg);
 }
 
 .toggle.active::after {
-    transform: translateX(20px);
+    transform: translateX(22px);
+    border-color: var(--fg);
 }
 
-.dark .toggle {
-    background: #334155;
-}
-
+/* ── Advanced toggle ── */
 .advanced-toggle {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    font-size: 12px;
-    letter-spacing: 0.12em;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 9999px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    transition: all 200ms ease;
 }
 
-.dark .advanced-toggle {
-    color: #94a3b8;
+.advanced-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: var(--shadow-color);
+    transform: translate(-2px, -2px);
 }
 
 .advanced-toggle .chevron {
-    transition: transform 150ms ease;
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .advanced-toggle.open .chevron {
@@ -170,37 +281,53 @@ body {
     display: block;
 }
 
+/* ── Raw logs toggle ── */
+.raw-logs-toggle {
+    padding: 6px 14px;
+    border-radius: 9999px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    font-weight: 600;
+    transition: all 200ms ease;
+}
+
+.raw-logs-toggle:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-color);
+    transform: translate(-1px, -1px);
+}
+
 .raw-logs-toggle .chevron {
-    transition: transform 150ms ease;
+    transition: transform 200ms ease;
 }
 
 .raw-logs-toggle.open .chevron {
     transform: rotate(90deg);
 }
 
+/* ── LLM provider cards — "Sticker" ── */
 .llm-card {
     width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.4);
-    background: #ffffff;
-    color: #0f172a;
-    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-}
-
-.dark .llm-card {
-    background: #1a202c;
-    color: #e2e8f0;
-    border-color: rgba(148, 163, 184, 0.2);
+    padding: 18px;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .llm-card:hover {
-    transform: translateY(-1px);
+    transform: translate(-2px, -2px) rotate(-1deg);
+    box-shadow: 6px 6px 0px 0px var(--border);
 }
 
 .llm-card[data-active="true"] {
-    border-color: #0d59f2;
-    box-shadow: 0 0 0 1px rgba(13, 89, 242, 0.3), 0 8px 20px rgba(13, 89, 242, 0.15);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-color);
+    background: #FAF5FF;
+    transform: translate(-2px, -2px);
 }
 
 .llm-card-inner {
@@ -208,23 +335,111 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
 }
 
+/* ── Candy Button utility ── */
+.btn-candy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: 2px solid var(--fg);
+    box-shadow: var(--shadow-md);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+}
+
+.btn-candy:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-candy:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px var(--fg);
+}
+
+/* ── Semantic log colors ── */
 .log-success {
-    color: #22c55e;
+    color: #059669;
 }
 
 .log-warning {
-    color: #f59e0b;
+    color: #D97706;
 }
 
 .log-error {
-    color: #ef4444;
+    color: #DC2626;
 }
 
 .log-info {
-    color: #60a5fa;
+    color: #7C3AED;
 }
 
+/* ── Decorative shapes ── */
+.deco-circle {
+    position: absolute;
+    border-radius: 9999px;
+    border: 3px solid;
+    pointer-events: none;
+    opacity: 0.15;
+}
+
+.deco-square {
+    position: absolute;
+    border: 3px solid;
+    pointer-events: none;
+    opacity: 0.12;
+    border-radius: 6px;
+}
+
+/* ── Step tracker ── */
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: var(--muted);
+    font-weight: 500;
+    transition: all 200ms ease;
+}
+
+.step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.step-item.step-active .step-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 3px 3px 0px 0px rgba(139, 92, 246, 0.3);
+    animation: wiggle 1s ease-in-out infinite;
+}
+
+.step-item.step-active {
+    color: var(--fg);
+    font-weight: 700;
+}
+
+.step-item.step-done .step-dot {
+    border-color: var(--quaternary);
+    background: var(--quaternary);
+    color: white;
+}
+
+.step-item.step-done {
+    color: var(--quaternary);
+}
