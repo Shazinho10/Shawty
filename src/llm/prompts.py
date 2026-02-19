@@ -92,6 +92,34 @@ Rules:
     return prompt
 
 
+def get_titles_reasons_prompt() -> ChatPromptTemplate:
+    """Prompt template for generating coherent titles and reasons from clip text."""
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """You generate short, coherent titles and reasons for video clips.
+
+You will be given multiple clip excerpts. Each excerpt includes a short transcript window.
+Return ONLY valid JSON. No extra text, no markdown.
+
+Output format:
+{
+  "items": [
+    { "index": 0, "title": "Specific headline", "reason": "1-2 sentences that reference the excerpt." }
+  ]
+}
+
+Rules:
+1) Each title must be specific and descriptive (4-12 words). Avoid generic filler.
+2) Each reason must be 1-2 sentences, 90-180 characters, and reference concrete details from the excerpt.
+3) Do not invent facts not present in the excerpt.
+4) Keep tone natural and coherent; complete sentences only.
+"""),
+        ("human", """Create titles and reasons for these clips:
+{items}
+""")
+    ])
+    return prompt
+
+
 def format_transcript_for_llm(transcription_result: dict) -> str:
     """
     Format transcription result into a readable string for LLM.

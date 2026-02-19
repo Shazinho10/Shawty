@@ -12,6 +12,7 @@ from ..utils import refine_shorts_output
 from .prompts import (
     get_shorts_selection_prompt,
     get_shorts_repair_prompt,
+    get_titles_reasons_prompt,
     format_transcript_for_llm,
     format_brand_context,
 )
@@ -31,6 +32,7 @@ class ShortsAgent:
         self.output_parser = PydanticOutputParser(pydantic_object=ShortsOutput)
         self.prompt = get_shorts_selection_prompt()
         self.repair_prompt = get_shorts_repair_prompt()
+        self.titles_reasons_prompt = get_titles_reasons_prompt()
     
     def select_shorts(
         self,
@@ -389,7 +391,7 @@ class ShortsAgent:
                 if text:
                     parts.append(text)
             joined = " ".join(parts).strip()
-            return joined[:400]
+            return joined[:700]
 
         def nearest_segment_text(time_sec: float) -> str:
             best = None
@@ -505,6 +507,24 @@ class ShortsAgent:
             if t:
                 title_counts[t] = title_counts.get(t, 0) + 1
 
+        repair_targets: List[Dict[str, Any]] = []
+        for idx, short in enumerate(output.shorts):
+            text = window_text(short.start_time, short.end_time) or nearest_segment_text(short.start_time)
+            title_key = (short.title or "").strip().lower()
+            repeated_title = title_key and title_counts.get(title_key, 0) > 1
+            needs_title = not short.title or is_generic_title(short.title) or repeated_title
+            needs_reason = not short.reason or is_generic_reason(short.reason)
+            if (needs_title or needs_reason) and text:
+                repair_targets.append({
+                    "index": idx,
+                    "start_time": round(float(short.start_time), 2),
+                    "end_time": round(float(short.end_time), 2),
+                    "text": text,
+                })
+
+        if repair_targets:
+            self._apply_llm_title_reason_repairs(output, repair_targets)
+
         enriched: List[ShortClient] = []
         for short in output.shorts:
             text = window_text(short.start_time, short.end_time) or nearest_segment_text(short.start_time)
@@ -519,6 +539,66 @@ class ShortsAgent:
             enriched.append(short)
 
         return ShortsOutput(shorts=enriched, total_shorts=len(enriched))
+
+    def _apply_llm_title_reason_repairs(self, output: ShortsOutput, repair_targets: List[Dict[str, Any]]) -> None:
+        """Use LLM to repair titles/reasons for low-quality clips."""
+        try:
+            items_lines = []
+            for item in repair_targets:
+                items_lines.append(
+                    f"Index: {item['index']}\n"
+                    f"Start: {item['start_time']} End: {item['end_time']}\n"
+                    f"Excerpt: {item['text']}\n"
+                )
+            items_blob = "\n".join(items_lines).strip()
+
+            formatted = self.titles_reasons_prompt.format_messages(items=items_blob)
+            response = self.llm.invoke(formatted)
+            content = response.content if hasattr(response, "content") else str(response)
+            content = content.strip()
+
+            content = re.sub(r'```json\s*', '', content)
+            content = re.sub(r'```\s*', '', content)
+            content = content.strip()
+
+            data = None
+            json_start = content.find("{")
+            json_end = content.rfind("}") + 1
+            if json_start >= 0 and json_end > json_start:
+                try:
+                    data = json.loads(content[json_start:json_end])
+                except json.JSONDecodeError:
+                    data = None
+
+            if data is None:
+                arr_start = content.find("[")
+                arr_end = content.rfind("]") + 1
+                if arr_start >= 0 and arr_end > arr_start:
+                    try:
+                        data = {"items": json.loads(content[arr_start:arr_end])}
+                    except json.JSONDecodeError:
+                        data = None
+
+            if not data or "items" not in data or not isinstance(data["items"], list):
+                return
+
+            for item in data["items"]:
+                if not isinstance(item, dict):
+                    continue
+                try:
+                    idx = int(item.get("index"))
+                except (TypeError, ValueError):
+                    continue
+                if idx < 0 or idx >= len(output.shorts):
+                    continue
+                title = str(item.get("title", "")).strip()
+                reason = str(item.get("reason", "")).strip()
+                if title:
+                    output.shorts[idx].title = title
+                if reason:
+                    output.shorts[idx].reason = reason
+        except Exception:
+            return
 
     def _rank_and_spread(
         self,

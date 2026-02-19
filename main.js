@@ -6,6 +6,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, protocol, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { spawn } = require('child_process');
 
 let mainWindow;
@@ -109,6 +110,172 @@ function runFfprobe(args) {
         });
         proc.on('error', (error) => reject(error));
     });
+}
+
+function ensureEven(value) {
+    const num = Math.floor(Number(value) || 0);
+    return num % 2 === 0 ? num : num - 1;
+}
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+async function getVideoProbe(filePath) {
+    const output = await runFfprobe([
+        '-v', 'error',
+        '-select_streams', 'v:0',
+        '-show_entries', 'format=duration:stream=width,height',
+        '-of', 'json',
+        filePath
+    ]);
+    const json = JSON.parse(output || '{}');
+    const durationSec = json.format && json.format.duration ? Number(json.format.duration) : null;
+    const stream = Array.isArray(json.streams) ? json.streams[0] : null;
+    const width = stream && stream.width ? Number(stream.width) : null;
+    const height = stream && stream.height ? Number(stream.height) : null;
+    return { durationSec, width, height };
+}
+
+function runFfmpeg(args) {
+    return new Promise((resolve, reject) => {
+        const ffmpeg = spawn('ffmpeg', args);
+        let stderrOutput = '';
+        ffmpeg.stderr.on('data', (data) => {
+            stderrOutput += data.toString();
+        });
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(new Error(stderrOutput || `ffmpeg exited with code ${code}`));
+            }
+        });
+        ffmpeg.on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
+async function extractSampleFrames(videoPath, durationSec) {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shawty-frames-'));
+    const framePaths = [];
+    const hasDuration = Number.isFinite(durationSec) && durationSec > 0;
+    const samplePoints = hasDuration ? [0.25, 0.5, 0.75].map(p => durationSec * p) : [0];
+
+    for (let i = 0; i < samplePoints.length; i++) {
+        const timeSec = Math.max(0, samplePoints[i]);
+        const framePath = path.join(tempDir, `frame_${i + 1}.jpg`);
+        await runFfmpeg([
+            '-y',
+            '-ss', timeSec.toString(),
+            '-i', videoPath,
+            '-frames:v', '1',
+            '-q:v', '2',
+            framePath
+        ]);
+        framePaths.push(framePath);
+    }
+
+    return { tempDir, framePaths };
+}
+
+let faceModelPromise = null;
+async function loadFaceModel() {
+    if (faceModelPromise) return faceModelPromise;
+    faceModelPromise = (async () => {
+        const tf = require('@tensorflow/tfjs-node');
+        const blazeface = require('@tensorflow-models/blazeface');
+        const model = await blazeface.load();
+        return { tf, model };
+    })();
+    return faceModelPromise;
+}
+
+async function detectAverageCenterX(framePaths) {
+    const { tf, model } = await loadFaceModel();
+    let totalCenterX = 0;
+    let validDetections = 0;
+
+    for (const framePath of framePaths) {
+        const imageBuffer = fs.readFileSync(framePath);
+        const tensor = tf.node.decodeImage(imageBuffer, 3);
+
+        const predictions = await model.estimateFaces(tensor, false);
+        if (predictions && predictions.length > 0) {
+            let best = predictions[0];
+            let bestArea = 0;
+            for (const pred of predictions) {
+                const tl = pred.topLeft;
+                const br = pred.bottomRight;
+                const w = br[0] - tl[0];
+                const h = br[1] - tl[1];
+                const area = w * h;
+                if (area > bestArea) {
+                    bestArea = area;
+                    best = pred;
+                }
+            }
+            const tl = best.topLeft;
+            const br = best.bottomRight;
+            const faceWidth = br[0] - tl[0];
+            const centerX = tl[0] + (faceWidth / 2);
+            if (Number.isFinite(centerX)) {
+                totalCenterX += centerX;
+                validDetections += 1;
+            }
+        }
+
+        tf.dispose(tensor);
+    }
+
+    if (validDetections === 0) return null;
+    return totalCenterX / validDetections;
+}
+
+async function buildPortraitCropPlan(videoPath) {
+    const meta = await getVideoProbe(videoPath);
+    if (!meta.width || !meta.height) {
+        throw new Error('Unable to read video dimensions for portrait crop.');
+    }
+
+    const width = meta.width;
+    const height = meta.height;
+    const cropHeight = ensureEven(height);
+    let cropWidth = ensureEven(Math.round(cropHeight * 9 / 16));
+    if (cropWidth <= 0) cropWidth = ensureEven(width);
+    if (cropWidth > width) cropWidth = ensureEven(width);
+
+    let centerX = width / 2;
+    let usedAi = false;
+    let tempDir = null;
+
+    try {
+        const sample = await extractSampleFrames(videoPath, meta.durationSec);
+        tempDir = sample.tempDir;
+        const aiCenterX = await detectAverageCenterX(sample.framePaths);
+        if (Number.isFinite(aiCenterX)) {
+            centerX = aiCenterX;
+            usedAi = true;
+        }
+    } catch (err) {
+        console.warn('[portrait] Face detection failed, using center crop:', err.message || err);
+    } finally {
+        if (tempDir) {
+            fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+    }
+
+    const cropX = clamp(Math.floor(centerX - (cropWidth / 2)), 0, Math.max(0, width - cropWidth));
+    const needsCrop = cropWidth < width;
+
+    return {
+        cropWidth,
+        cropHeight,
+        cropX,
+        needsCrop,
+        usedAi
+    };
 }
 
 async function getVideoInfo(filePath) {
@@ -495,7 +662,7 @@ ipcMain.handle('fs:getVideoInfo', async (_event, filePath) => {
 // IPC HANDLERS - Video Clipping
 // ================================================
 
-ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shorts }) => {
+ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shorts, portraitCrop }) => {
     const videoBaseName = path.basename(videoPath, path.extname(videoPath));
     const clipsFolder = path.join(outputDir, `${sanitizeFilename(videoBaseName)}_clips`);
 
@@ -505,6 +672,17 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
     }
 
     const results = [];
+    let cropPlan = null;
+
+    if (portraitCrop) {
+        try {
+            cropPlan = await buildPortraitCropPlan(videoPath);
+            console.log('[portrait] Crop plan:', cropPlan);
+        } catch (err) {
+            console.error('[portrait] Failed to build crop plan:', err);
+            cropPlan = null;
+        }
+    }
 
     for (let i = 0; i < shorts.length; i++) {
         const short = shorts[i];
@@ -521,15 +699,32 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
 
         try {
             await new Promise((resolve, reject) => {
-                const ffmpeg = spawn('ffmpeg', [
-                    '-y',                              // Overwrite output
-                    '-ss', short.start_time.toString(), // Start time (before -i for fast seek)
-                    '-i', videoPath,                   // Input file
-                    '-t', duration.toString(),         // Duration
-                    '-c', 'copy',                      // Stream copy (fast, cuts at nearest keyframe)
-                    '-avoid_negative_ts', 'make_zero', // Fix timestamp issues
-                    clipPath                           // Output file
-                ]);
+                const args = [
+                    '-y',
+                    '-ss', short.start_time.toString(),
+                    '-i', videoPath,
+                    '-t', duration.toString()
+                ];
+
+                if (portraitCrop && cropPlan && cropPlan.needsCrop) {
+                    args.push(
+                        '-vf', `crop=${cropPlan.cropWidth}:${cropPlan.cropHeight}:${cropPlan.cropX}:0`,
+                        '-c:v', 'libx264',
+                        '-preset', 'fast',
+                        '-crf', '23',
+                        '-pix_fmt', 'yuv420p',
+                        '-c:a', 'aac'
+                    );
+                } else {
+                    args.push('-c', 'copy');
+                }
+
+                args.push(
+                    '-avoid_negative_ts', 'make_zero',
+                    clipPath
+                );
+
+                const ffmpeg = spawn('ffmpeg', args);
 
                 let stderrOutput = '';
                 ffmpeg.stderr.on('data', (data) => {
@@ -538,10 +733,9 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
 
                 ffmpeg.on('close', (code) => {
                     if (code === 0) {
-                        // Validate file size (Reason #2: 0-Byte File check)
                         try {
                             const { size } = fs.statSync(clipPath);
-                            if (size < 1000) { // Less than 1KB
+                            if (size < 1000) {
                                 console.error(`[FFmpeg] Clip failed (File too small): ${clipPath}`);
                                 reject(new Error('Clip file too small (possible FFmpeg silent failure)'));
                                 return;

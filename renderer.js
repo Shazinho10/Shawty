@@ -49,6 +49,7 @@ const elements = {
     advancedContent: document.getElementById('advancedContent'),
     brandFilePreview: document.getElementById('brandFilePreview'),
     autoOpenToggle: document.getElementById('autoOpenToggle'),
+    portraitCropToggle: document.getElementById('portraitCropToggle'),
     processingStage: document.getElementById('processingStage'),
     processingPercent: document.getElementById('processingPercent'),
     processingCircle: document.getElementById('processingProgressCircle'),
@@ -517,7 +518,8 @@ async function handleComplete(data) {
             const clipResult = await window.api.clipVideos({
                 videoPath: state.videoPath,
                 outputDir: state.outputFolder,
-                shorts: data.resultJson.shorts
+                shorts: data.resultJson.shorts,
+                portraitCrop: elements.portraitCropToggle?.classList.contains('active') || false
             });
 
             state.clipsFolder = clipResult.clipsFolder;
@@ -667,6 +669,13 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.autoOpenToggle.addEventListener('click', () => {
         elements.autoOpenToggle.classList.toggle('active');
     });
+
+    // Portrait crop toggle
+    if (elements.portraitCropToggle) {
+        elements.portraitCropToggle.addEventListener('click', () => {
+            elements.portraitCropToggle.classList.toggle('active');
+        });
+    }
 
     // Advanced toggle
     elements.advancedToggle.addEventListener('click', () => {

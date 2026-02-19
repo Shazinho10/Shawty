@@ -19,6 +19,10 @@
     "url": "https://github.com/Shazinho10/Shawty/issues"
   },
   "homepage": "https://github.com/Shazinho10/Shawty#readme",
+  "dependencies": {
+    "@tensorflow-models/blazeface": "^0.1.0",
+    "@tensorflow/tfjs-node": "^4.22.0"
+  },
   "devDependencies": {
     "electron": "^40.1.0"
   }
