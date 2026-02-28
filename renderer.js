@@ -50,6 +50,7 @@ const elements = {
     brandFilePreview: document.getElementById('brandFilePreview'),
     autoOpenToggle: document.getElementById('autoOpenToggle'),
     portraitCropToggle: document.getElementById('portraitCropToggle'),
+    activeSpeakerToggle: document.getElementById('activeSpeakerToggle'),
     processingStage: document.getElementById('processingStage'),
     processingPercent: document.getElementById('processingPercent'),
     processingCircle: document.getElementById('processingProgressCircle'),
@@ -515,11 +516,19 @@ async function handleComplete(data) {
     // Start clipping videos in background
     if (data.resultJson && data.resultJson.shorts && state.videoPath) {
         try {
+            console.log('[clip] Starting clipVideos IPC...', {
+                videoPath: state.videoPath,
+                outputDir: state.outputFolder,
+                shorts: data.resultJson.shorts.length,
+                portraitCrop: elements.portraitCropToggle?.classList.contains('active') || false,
+                activeSpeakerCrop: elements.activeSpeakerToggle?.classList.contains('active') || false
+            });
             const clipResult = await window.api.clipVideos({
                 videoPath: state.videoPath,
                 outputDir: state.outputFolder,
                 shorts: data.resultJson.shorts,
-                portraitCrop: elements.portraitCropToggle?.classList.contains('active') || false
+                portraitCrop: elements.portraitCropToggle?.classList.contains('active') || false,
+                activeSpeakerCrop: elements.activeSpeakerToggle?.classList.contains('active') || false
             });
 
             state.clipsFolder = clipResult.clipsFolder;
@@ -530,6 +539,12 @@ async function handleComplete(data) {
         } catch (error) {
             console.error('Failed to clip videos:', error);
         }
+    } else {
+        console.warn('[clip] Skipping clipVideos (missing resultJson or videoPath).', {
+            hasResultJson: Boolean(data.resultJson),
+            hasShorts: Boolean(data.resultJson?.shorts?.length),
+            hasVideoPath: Boolean(state.videoPath)
+        });
     }
 }
 
@@ -674,6 +689,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (elements.portraitCropToggle) {
         elements.portraitCropToggle.addEventListener('click', () => {
             elements.portraitCropToggle.classList.toggle('active');
+            if (!elements.portraitCropToggle.classList.contains('active') && elements.activeSpeakerToggle) {
+                elements.activeSpeakerToggle.classList.remove('active');
+            }
+        });
+    }
+    // Active speaker toggle
+    if (elements.activeSpeakerToggle) {
+        elements.activeSpeakerToggle.addEventListener('click', () => {
+            if (!elements.portraitCropToggle?.classList.contains('active')) {
+                return;
+            }
+            elements.activeSpeakerToggle.classList.toggle('active');
         });
     }
 

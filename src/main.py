@@ -74,7 +74,12 @@ def main(
         click.echo("Getting video duration...")
         duration = get_video_duration(video_path)
         if target_shorts is None:
-            target_shorts = 15 if duration >= 3600 else 5
+            if duration >= 3600:
+                target_shorts = 15
+            elif duration >= 1800:
+                target_shorts = 10
+            else:
+                target_shorts = 5
         click.echo(f"✓ Video duration: {duration:.1f}s ({duration/60:.1f} min)")
         
         use_chunking = duration > chunk_duration

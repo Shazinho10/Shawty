@@ -1,5 +1,8 @@
 """Langchain prompts for short selection"""
 
+'''i need to make sure that if more than 2 ppl then it crops both ppl in the frame else it
+puts one person in one frame'''
+
 from langchain_core.prompts import ChatPromptTemplate
 
 
@@ -20,6 +23,7 @@ Use these go/no-go metrics when deciding if a moment is clip-worthy. A clip shou
 6) Loop potential (ends on punchline, cliffhanger, or unfinished thought).
 
 CRITICAL INSTRUCTION: You must output ONLY valid JSON. Do not include any thinking, reasoning, or markdown formatting outside the JSON object.
+All titles and reasons MUST be in English only. If the transcript is not English, translate/summarize into English.
 
 Output Structure:
 {{
@@ -47,6 +51,7 @@ Rules:
 10. Do not output anything else (no <think> tags, no markdown blocks).
 11. Example valid start_time: 10.5
 12. Example INVALID start_time: "10.5s"
+13. Output titles and reasons in English only (no Urdu/Hindi or other scripts).
 """),
         ("human", """Analyze the following transcript and return the JSON object.
 Return up to {target_shorts} clips.
@@ -112,6 +117,8 @@ Rules:
 2) Each reason must be 1-2 sentences, 90-180 characters, and reference concrete details from the excerpt.
 3) Do not invent facts not present in the excerpt.
 4) Keep tone natural and coherent; complete sentences only.
+5) Output must be in English only. If excerpt is not English, translate/summarize into English.
+6) Do NOT use placeholder titles like "Key Moment" or "Untitled".
 """),
         ("human", """Create titles and reasons for these clips:
 {items}

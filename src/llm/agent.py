@@ -379,6 +379,8 @@ class ShortsAgent:
         segments = transcription_result.get("segments", []) if transcription_result else []
         if not segments:
             return output
+        language = str(transcription_result.get("language", "") or "").lower()
+        force_english = language not in {"en", "english"}
 
         def window_text(start_time: float, end_time: float) -> str:
             parts = []
@@ -391,7 +393,7 @@ class ShortsAgent:
                 if text:
                     parts.append(text)
             joined = " ".join(parts).strip()
-            return joined[:700]
+            return joined[:1400]
 
         def nearest_segment_text(time_sec: float) -> str:
             best = None
@@ -500,6 +502,23 @@ class ShortsAgent:
                 reason += "."
             return reason
 
+        def is_non_english_text(text: str) -> bool:
+            if not text:
+                return False
+            # Detect common non-Latin scripts (Arabic, Urdu, Hindi/Devanagari)
+            for ch in text:
+                code = ord(ch)
+                if 0x0600 <= code <= 0x06FF or 0x0750 <= code <= 0x077F or 0x08A0 <= code <= 0x08FF:
+                    return True
+                if 0x0900 <= code <= 0x097F:
+                    return True
+            # Heuristic: if very few ASCII letters, assume non-English
+            letters = sum(1 for c in text if c.isalpha())
+            ascii_letters = sum(1 for c in text if c.isalpha() and ord(c) < 128)
+            if letters > 0 and (ascii_letters / letters) < 0.6:
+                return True
+            return False
+
         # Detect repeated titles and treat them as generic
         title_counts: Dict[str, int] = {}
         for s in output.shorts:
@@ -514,7 +533,8 @@ class ShortsAgent:
             repeated_title = title_key and title_counts.get(title_key, 0) > 1
             needs_title = not short.title or is_generic_title(short.title) or repeated_title
             needs_reason = not short.reason or is_generic_reason(short.reason)
-            if (needs_title or needs_reason) and text:
+            non_english = is_non_english_text(short.title or "") or is_non_english_text(short.reason or "")
+            if text:
                 repair_targets.append({
                     "index": idx,
                     "start_time": round(float(short.start_time), 2),
@@ -530,12 +550,19 @@ class ShortsAgent:
             text = window_text(short.start_time, short.end_time) or nearest_segment_text(short.start_time)
             title_key = (short.title or "").strip().lower()
             repeated_title = title_key and title_counts.get(title_key, 0) > 1
-            if not short.title or is_generic_title(short.title) or repeated_title:
-                if text:
-                    short.title = make_title_from_text(text) or "Key Moment"
-            if not short.reason or is_generic_reason(short.reason):
-                if text:
-                    short.reason = make_reason_from_text(text) or f"Explores a clear, self-contained moment."
+            non_english = is_non_english_text(short.title or "") or is_non_english_text(short.reason or "")
+            if force_english or non_english:
+                if not short.title or is_generic_title(short.title) or repeated_title or non_english:
+                    short.title = "Key Moment"
+                if not short.reason or is_generic_reason(short.reason) or non_english:
+                    short.reason = "Highlights a clear, self-contained point from the segment."
+            else:
+                if not short.title or is_generic_title(short.title) or repeated_title:
+                    if text:
+                        short.title = make_title_from_text(text) or "Key Moment"
+                if not short.reason or is_generic_reason(short.reason):
+                    if text:
+                        short.reason = make_reason_from_text(text) or "Explores a clear, self-contained moment."
             enriched.append(short)
 
         return ShortsOutput(shorts=enriched, total_shorts=len(enriched))

@@ -89,6 +89,14 @@ function getMimeType(filePath) {
     return mimeTypes[ext] || 'video/mp4';
 }
 
+function resolvePythonExecutable() {
+    const venvPython = process.platform === 'win32'
+        ? path.join(__dirname, 'venv', 'Scripts', 'python.exe')
+        : path.join(__dirname, 'venv', 'bin', 'python');
+
+    return fs.existsSync(venvPython) ? venvPython : 'python';
+}
+
 function runFfprobe(args) {
     return new Promise((resolve, reject) => {
         const proc = spawn('ffprobe', args);
@@ -157,11 +165,20 @@ function runFfmpeg(args) {
     });
 }
 
-async function extractSampleFrames(videoPath, durationSec) {
+async function extractSampleFrames(videoPath, durationSec, options = {}) {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shawty-frames-'));
     const framePaths = [];
+    const sampleCount = Math.max(1, Math.min(12, Number(options.sampleCount) || 3));
     const hasDuration = Number.isFinite(durationSec) && durationSec > 0;
-    const samplePoints = hasDuration ? [0.25, 0.5, 0.75].map(p => durationSec * p) : [0];
+    let samplePoints = [0];
+    if (hasDuration) {
+        if (sampleCount === 1) {
+            samplePoints = [durationSec * 0.5];
+        } else {
+            const step = 1 / (sampleCount + 1);
+            samplePoints = Array.from({ length: sampleCount }, (_, i) => durationSec * (step * (i + 1)));
+        }
+    }
 
     for (let i = 0; i < samplePoints.length; i++) {
         const timeSec = Math.max(0, samplePoints[i]);
@@ -178,6 +195,60 @@ async function extractSampleFrames(videoPath, durationSec) {
     }
 
     return { tempDir, framePaths };
+}
+
+async function analyzeFacesWithMediapipe(framePaths, options = {}) {
+    const pythonExecutable = resolvePythonExecutable();
+    const scriptPath = path.join(__dirname, 'src', 'utils', 'mediapipe_faces.py');
+    const activeSpeaker = Boolean(options.activeSpeaker);
+
+    console.log(`[mediapipe] Using python: ${pythonExecutable}`);
+    console.log(`[mediapipe] Script: ${scriptPath}`);
+    console.log(`[mediapipe] Active speaker mode: ${activeSpeaker ? 'on' : 'off'}`);
+
+    if (!fs.existsSync(scriptPath)) {
+        throw new Error(`MediaPipe script not found at ${scriptPath}`);
+    }
+
+    return new Promise((resolve, reject) => {
+        const args = ['-u', scriptPath, '--frames', ...framePaths];
+        if (activeSpeaker) {
+            args.push('--active-speaker');
+        }
+        const proc = spawn(pythonExecutable, args);
+        let stdout = '';
+        let stderr = '';
+
+        proc.stdout.on('data', (data) => {
+            stdout += data.toString();
+        });
+
+        proc.stderr.on('data', (data) => {
+            const text = data.toString();
+            stderr += text;
+            text.split('\n').filter(Boolean).forEach(line => {
+                console.log(line);
+            });
+        });
+
+        proc.on('close', (code) => {
+            if (code !== 0) {
+                return reject(new Error(stderr || `mediapipe exited with code ${code}`));
+            }
+
+            try {
+                const output = stdout.trim();
+                const parsed = JSON.parse(output);
+                resolve(parsed);
+            } catch (err) {
+                reject(new Error(`Failed to parse mediapipe output: ${err.message || err}`));
+            }
+        });
+
+        proc.on('error', (err) => {
+            reject(err);
+        });
+    });
 }
 
 let faceModelPromise = null;
@@ -233,7 +304,7 @@ async function detectAverageCenterX(framePaths) {
     return totalCenterX / validDetections;
 }
 
-async function buildPortraitCropPlan(videoPath) {
+async function buildPortraitCropPlan(videoPath, options = {}) {
     const meta = await getVideoProbe(videoPath);
     if (!meta.width || !meta.height) {
         throw new Error('Unable to read video dimensions for portrait crop.');
@@ -249,21 +320,103 @@ async function buildPortraitCropPlan(videoPath) {
     let centerX = width / 2;
     let usedAi = false;
     let tempDir = null;
+    let multiFaceDetected = false;
+    const activeSpeaker = Boolean(options.activeSpeaker);
+    const minSpeakerFrameRatio = Number(options.minSpeakerFrameRatio ?? 0.6);
+    const minSpeakerMotionRatio = Number(options.minSpeakerMotionRatio ?? 0.55);
+    let speakerUsed = false;
+    let analysisOk = false;
+    let fallbackUsed = false;
 
     try {
-        const sample = await extractSampleFrames(videoPath, meta.durationSec);
+        console.log(`[portrait] Starting MediaPipe analysis... (active speaker: ${activeSpeaker ? 'on' : 'off'})`);
+        const sample = await extractSampleFrames(videoPath, meta.durationSec, {
+            sampleCount: activeSpeaker ? 9 : 3
+        });
         tempDir = sample.tempDir;
-        const aiCenterX = await detectAverageCenterX(sample.framePaths);
-        if (Number.isFinite(aiCenterX)) {
-            centerX = aiCenterX;
-            usedAi = true;
+        console.log('[portrait] Sample frames:', sample.framePaths);
+
+        const analysis = await analyzeFacesWithMediapipe(sample.framePaths, { activeSpeaker });
+        console.log('[portrait] MediaPipe result:', analysis);
+
+        if (analysis && analysis.ok) {
+            analysisOk = true;
+            multiFaceDetected = Boolean(analysis.multi_face);
+            if (activeSpeaker && Number.isFinite(analysis.speaker_center_x)) {
+                const frameRatio = Number(analysis.speaker_frame_ratio);
+                const motionRatio = Number(analysis.speaker_motion_ratio);
+                const frameOk = Number.isFinite(frameRatio) ? frameRatio >= minSpeakerFrameRatio : false;
+                const motionOk = Number.isFinite(motionRatio) ? motionRatio >= minSpeakerMotionRatio : false;
+
+                console.log(`[portrait] Speaker ratios: frame=${Number.isFinite(frameRatio) ? frameRatio.toFixed(2) : 'n/a'} motion=${Number.isFinite(motionRatio) ? motionRatio.toFixed(2) : 'n/a'}`);
+                console.log(`[portrait] Speaker thresholds: frame>=${minSpeakerFrameRatio} motion>=${minSpeakerMotionRatio}`);
+
+                if (frameOk && motionOk) {
+                    centerX = analysis.speaker_center_x;
+                    usedAi = true;
+                    speakerUsed = true;
+                    console.log('[portrait] Active speaker center detected (thresholds passed).');
+                } else {
+                    console.log('[portrait] Active speaker detected but confidence too low. Falling back.');
+                }
+            } else if (Number.isFinite(analysis.center_x)) {
+                centerX = analysis.center_x;
+                usedAi = true;
+            } else {
+                console.warn('[portrait] MediaPipe found no usable face centers. Using center crop.');
+            }
+        } else {
+            console.warn('[portrait] MediaPipe returned no result. Using center crop.');
+        }
+
+        if (!analysisOk || (activeSpeaker && !speakerUsed && !usedAi)) {
+            console.warn('[portrait] MediaPipe unavailable or low confidence. Trying BlazeFace fallback...');
+            try {
+                const fallbackCenterX = await detectAverageCenterX(sample.framePaths);
+                if (Number.isFinite(fallbackCenterX)) {
+                    centerX = fallbackCenterX;
+                    usedAi = true;
+                    fallbackUsed = true;
+                    console.log('[portrait] BlazeFace fallback center detected.');
+                } else {
+                    console.warn('[portrait] BlazeFace found no faces. Using center crop.');
+                }
+            } catch (err) {
+                console.warn('[portrait] BlazeFace fallback failed. Using center crop:', err.message || err);
+            }
         }
     } catch (err) {
-        console.warn('[portrait] Face detection failed, using center crop:', err.message || err);
+        console.warn('[portrait] MediaPipe analysis failed, using center crop:', err.message || err);
     } finally {
         if (tempDir) {
             fs.rmSync(tempDir, { recursive: true, force: true });
         }
+    }
+
+    if (multiFaceDetected && !speakerUsed && !activeSpeaker) {
+        console.log('[portrait] Multiple faces detected. Keeping original aspect ratio.');
+        return {
+            cropWidth: width,
+            cropHeight: height,
+            cropX: 0,
+            needsCrop: false,
+            usedAi: usedAi,
+            multiFaceDetected: true,
+            activeSpeaker: false
+        };
+    }
+
+    if (multiFaceDetected && activeSpeaker && !speakerUsed) {
+        console.log('[portrait] Multiple faces detected. Keeping original aspect ratio.');
+        return {
+            cropWidth: width,
+            cropHeight: height,
+            cropX: 0,
+            needsCrop: false,
+            usedAi: usedAi,
+            multiFaceDetected: true,
+            activeSpeaker: true
+        };
     }
 
     const cropX = clamp(Math.floor(centerX - (cropWidth / 2)), 0, Math.max(0, width - cropWidth));
@@ -274,7 +427,10 @@ async function buildPortraitCropPlan(videoPath) {
         cropHeight,
         cropX,
         needsCrop,
-        usedAi
+        usedAi,
+        multiFaceDetected: false,
+        activeSpeaker: activeSpeaker,
+        fallbackUsed
     };
 }
 
@@ -549,11 +705,7 @@ ipcMain.handle('process:start', async (_event, options) => {
         args.push('--brand-file', brandFile);
     }
 
-    const venvPython = process.platform === 'win32'
-        ? path.join(__dirname, 'venv', 'Scripts', 'python.exe')
-        : path.join(__dirname, 'venv', 'bin', 'python');
-
-    const pythonExecutable = fs.existsSync(venvPython) ? venvPython : 'python';
+    const pythonExecutable = resolvePythonExecutable();
 
     // Spawn Python process
     pythonProcess = spawn(pythonExecutable, args, {
@@ -588,22 +740,36 @@ ipcMain.handle('process:start', async (_event, options) => {
     pythonProcess.on('close', (code) => {
         mainWindow.setProgressBar(-1);
 
-        if (code === 0) {
-            let resultJson = null;
-            try {
+        let resultJson = null;
+        let hasValidOutput = false;
+        try {
+            if (fs.existsSync(outputPath)) {
                 const jsonContent = fs.readFileSync(outputPath, 'utf8');
                 resultJson = JSON.parse(jsonContent);
-            } catch (err) {
-                console.error('Failed to read output JSON:', err);
+                hasValidOutput = true;
             }
+        } catch (err) {
+            console.error('Failed to read output JSON:', err);
+        }
 
+        if (code === 0) {
             mainWindow.webContents.send('process:complete', {
                 exitCode: code,
                 outputPath: outputPath,
                 resultJson: resultJson
             });
         } else if (code !== null) {
-            mainWindow.webContents.send('process:error', `Process exited with code ${code}`);
+            if (hasValidOutput) {
+                console.warn(`[process] Non-zero exit (${code}) but output is valid. Treating as success.`);
+                mainWindow.webContents.send('process:complete', {
+                    exitCode: code,
+                    outputPath: outputPath,
+                    resultJson: resultJson,
+                    warning: `Process exited with code ${code} after writing output.`
+                });
+            } else {
+                mainWindow.webContents.send('process:error', `Process exited with code ${code}`);
+            }
         }
 
         pythonProcess = null;
@@ -662,7 +828,14 @@ ipcMain.handle('fs:getVideoInfo', async (_event, filePath) => {
 // IPC HANDLERS - Video Clipping
 // ================================================
 
-ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shorts, portraitCrop }) => {
+ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shorts, portraitCrop, activeSpeakerCrop }) => {
+    console.log('[clip] IPC received:', {
+        videoPath,
+        outputDir,
+        shorts: Array.isArray(shorts) ? shorts.length : null,
+        portraitCrop,
+        activeSpeakerCrop
+    });
     const videoBaseName = path.basename(videoPath, path.extname(videoPath));
     const clipsFolder = path.join(outputDir, `${sanitizeFilename(videoBaseName)}_clips`);
 
@@ -670,13 +843,14 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
     if (!fs.existsSync(clipsFolder)) {
         fs.mkdirSync(clipsFolder, { recursive: true });
     }
+    console.log('[clip] Clips folder:', clipsFolder);
 
     const results = [];
     let cropPlan = null;
 
     if (portraitCrop) {
         try {
-            cropPlan = await buildPortraitCropPlan(videoPath);
+            cropPlan = await buildPortraitCropPlan(videoPath, { activeSpeaker: Boolean(activeSpeakerCrop) });
             console.log('[portrait] Crop plan:', cropPlan);
         } catch (err) {
             console.error('[portrait] Failed to build crop plan:', err);
