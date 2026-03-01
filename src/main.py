@@ -20,6 +20,21 @@ load_dotenv()
 
 print("DEBUG: STARTING WITH PATCHES v2", flush=True)
 
+def _cuda_available() -> bool:
+    try:
+        import torch
+        return bool(torch.cuda.is_available())
+    except Exception:
+        return False
+
+def _resolve_asr_device(device: str, compute_type: str) -> tuple[str, str]:
+    if device and device != "auto":
+        return device, compute_type
+    if _cuda_available():
+        # Prefer GPU when available
+        return "cuda", "float16"
+    return "cpu", "int8"
+
 @click.command()
 @click.argument('video_path', type=click.Path(exists=True))
 @click.option('--openai-key', help='OpenAI API key (or set OPENAI_API_KEY env var)')
@@ -30,7 +45,7 @@ print("DEBUG: STARTING WITH PATCHES v2", flush=True)
 @click.option('--skip-diarization', is_flag=True, help='Skip speaker diarization')
 @click.option('--model-size', default='tiny', help='Whisper model size (tiny, base, small, medium, large-v2, large-v3). Default is "tiny" for speed.')
 @click.option('--hf-token', help='HuggingFace token for diarization (or set HF_TOKEN env var)')
-@click.option('--cpu-threads', default=4, help='Number of threads for CPU inference')
+@click.option('--cpu-threads', default=4, type=int, help='Number of threads for CPU inference')
 @click.option('--chunk-duration', default=600, help='Audio chunk duration in seconds (default 600 = 10 min). Set lower to test chunking on short videos.')
 @click.option('--target-shorts', default=None, type=int, help='Number of shorts to select (default: 5, or 15 for 60+ min videos)')
 @click.option('--min-gap-seconds', default=90, type=int, help='Minimum spacing between clips by midpoint (seconds)')
@@ -106,10 +121,12 @@ def main(
             audio_paths_to_cleanup = [path for path, _ in chunks]
             
             # Transcribe all chunks
-            click.echo(f"Transcribing audio chunks with Faster Whisper (Model: {model_size}, Threads: {cpu_threads})...")
+            device, compute_type = _resolve_asr_device("auto", "int8")
+            click.echo(f"Transcribing audio chunks with Faster Whisper (Model: {model_size}, Device: {device}, Compute: {compute_type}, Threads: {cpu_threads})...")
             with Transcriber(
                 model_size=model_size,
-                compute_type="int8",
+                device=device,
+                compute_type=compute_type,
                 cpu_threads=cpu_threads
             ) as transcriber:
                 def on_transcribe_progress(current, total):
@@ -139,10 +156,12 @@ def main(
             audio_paths_to_cleanup.append(audio_path)
             click.echo(f"✓ Audio extracted to {audio_path}")
             
-            click.echo(f"Transcribing audio with Faster Whisper (Model: {model_size}, Threads: {cpu_threads})...")
+            device, compute_type = _resolve_asr_device("auto", "int8")
+            click.echo(f"Transcribing audio with Faster Whisper (Model: {model_size}, Device: {device}, Compute: {compute_type}, Threads: {cpu_threads})...")
             with Transcriber(
                 model_size=model_size,
-                compute_type="int8",
+                device=device,
+                compute_type=compute_type,
                 cpu_threads=cpu_threads
             ) as transcriber:
                 transcription_result = transcriber.transcribe(
@@ -161,7 +180,8 @@ def main(
             if hf_token:
                 click.echo("Performing speaker diarization...")
                 try:
-                    diarizer = Diarizer(hf_token=hf_token)
+                    diarizer_device = "cuda" if _cuda_available() else "cpu"
+                    diarizer = Diarizer(hf_token=hf_token, device=diarizer_device)
                     diarization_result = diarizer.diarize(audio_path_for_diarization, transcription_result)
                     if diarization_result:
                         transcription_result = diarizer.merge_with_transcription(

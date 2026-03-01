@@ -197,6 +197,25 @@ async function extractSampleFrames(videoPath, durationSec, options = {}) {
     return { tempDir, framePaths };
 }
 
+async function extractFramesAtTimes(videoPath, timesSec) {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shawty-frames-'));
+    const framePaths = [];
+    for (let i = 0; i < timesSec.length; i++) {
+        const timeSec = Math.max(0, Number(timesSec[i]) || 0);
+        const framePath = path.join(tempDir, `frame_${i + 1}.jpg`);
+        await runFfmpeg([
+            '-y',
+            '-ss', timeSec.toString(),
+            '-i', videoPath,
+            '-frames:v', '1',
+            '-q:v', '2',
+            framePath
+        ]);
+        framePaths.push(framePath);
+    }
+    return { tempDir, framePaths };
+}
+
 async function analyzeFacesWithMediapipe(framePaths, options = {}) {
     const pythonExecutable = resolvePythonExecutable();
     const scriptPath = path.join(__dirname, 'src', 'utils', 'mediapipe_faces.py');
@@ -313,7 +332,7 @@ async function buildPortraitCropPlan(videoPath, options = {}) {
     const width = meta.width;
     const height = meta.height;
     const cropHeight = ensureEven(height);
-    let cropWidth = ensureEven(Math.round(cropHeight * 9 / 16));
+    let cropWidth = ensureEven(Math.round(cropHeight * 10 / 16));
     if (cropWidth <= 0) cropWidth = ensureEven(width);
     if (cropWidth > width) cropWidth = ensureEven(width);
 
@@ -432,6 +451,181 @@ async function buildPortraitCropPlan(videoPath, options = {}) {
         activeSpeaker: activeSpeaker,
         fallbackUsed
     };
+}
+
+function buildCropSegments(times, centers, startTime, endTime, jitterPx, minSegmentSeconds = 0.75) {
+    const valid = [];
+    for (let i = 0; i < times.length; i++) {
+        const t = Number(times[i]);
+        const c = centers[i];
+        if (Number.isFinite(t) && Number.isFinite(c)) {
+            valid.push({ t, c });
+        }
+    }
+    if (valid.length === 0) {
+        return [];
+    }
+    valid.sort((a, b) => a.t - b.t);
+
+    const merged = [];
+    const jitterThreshold = Math.max(1, Number(jitterPx) || 0);
+    for (const item of valid) {
+        const last = merged[merged.length - 1];
+        if (!last) {
+            merged.push({ ...item });
+            continue;
+        }
+        const diff = Math.abs(item.c - last.c);
+        if (diff <= jitterThreshold) {
+            last.t = item.t;
+            last.c = (last.c + item.c) / 2;
+        } else {
+            merged.push({ ...item });
+        }
+    }
+
+    let segments = [];
+    for (let i = 0; i < merged.length; i++) {
+        const current = merged[i];
+        const prev = merged[i - 1];
+        const next = merged[i + 1];
+        const segStart = i === 0 ? startTime : (prev.t + current.t) / 2;
+        const segEnd = i === merged.length - 1 ? endTime : (current.t + next.t) / 2;
+        segments.push({ start: segStart, end: segEnd, centerX: current.c });
+    }
+    segments = segments.filter(seg => seg.end > seg.start);
+
+    if (segments.length <= 1 || minSegmentSeconds <= 0) {
+        return segments;
+    }
+
+    const mergedSegments = [];
+    for (const seg of segments) {
+        const last = mergedSegments[mergedSegments.length - 1];
+        if (!last) {
+            mergedSegments.push({ ...seg });
+            continue;
+        }
+        if ((seg.end - seg.start) < minSegmentSeconds) {
+            last.end = Math.max(last.end, seg.end);
+            last.centerX = (last.centerX + seg.centerX) / 2;
+        } else {
+            mergedSegments.push({ ...seg });
+        }
+    }
+    return mergedSegments;
+}
+
+function buildDynamicCropFilter(segments, cropWidth, cropHeight) {
+    const filters = [];
+    const concatInputs = [];
+
+    segments.forEach((seg, idx) => {
+        const s = Math.max(0, seg.start).toFixed(3);
+        const e = Math.max(seg.start + 0.01, seg.end).toFixed(3);
+        const x = Math.max(0, Math.floor(seg.cropX || 0));
+        filters.push(
+            `[0:v]trim=start=${s}:end=${e},setpts=PTS-STARTPTS,crop=${cropWidth}:${cropHeight}:${x}:0[v${idx}]`
+        );
+        filters.push(
+            `[0:a]atrim=start=${s}:end=${e},asetpts=PTS-STARTPTS[a${idx}]`
+        );
+        concatInputs.push(`[v${idx}][a${idx}]`);
+    });
+
+    const concat = `${concatInputs.join('')}concat=n=${segments.length}:v=1:a=1[v][a]`;
+    filters.push(concat);
+
+    return {
+        filterComplex: filters.join(';'),
+        mapArgs: ['-map', '[v]', '-map', '[a]']
+    };
+}
+
+async function buildDynamicCropPlan(videoPath, short, options = {}) {
+    const meta = await getVideoProbe(videoPath);
+    if (!meta.width || !meta.height) {
+        throw new Error('Unable to read video dimensions for dynamic crop.');
+    }
+
+    const width = meta.width;
+    const height = meta.height;
+    const cropHeight = ensureEven(height);
+    let cropWidth = ensureEven(Math.round(cropHeight * 10 / 16));
+    if (cropWidth <= 0) cropWidth = ensureEven(width);
+    if (cropWidth > width) cropWidth = ensureEven(width);
+
+    const duration = Math.max(0.1, Number(short.end_time) - Number(short.start_time));
+    const sampleCount = Math.max(3, Math.min(9, Math.round(duration / 10) + 2));
+    const step = duration / (sampleCount + 1);
+    const times = Array.from({ length: sampleCount }, (_, i) => Number(short.start_time) + step * (i + 1));
+
+    let tempDir = null;
+    try {
+        const sample = await extractFramesAtTimes(videoPath, times);
+        tempDir = sample.tempDir;
+        const analysis = await analyzeFacesWithMediapipe(sample.framePaths, {
+            activeSpeaker: Boolean(options.activeSpeaker)
+        });
+
+        let centers = [];
+        if (analysis && analysis.ok && Array.isArray(analysis.frame_centers)) {
+            centers = analysis.frame_centers.map(val => (Number.isFinite(Number(val)) ? Number(val) : null));
+        }
+
+        if (!centers.length) {
+            centers = new Array(times.length).fill(width / 2);
+        }
+
+        // Smooth center positions to reduce choppy crops
+        const smoothed = [];
+        const alpha = 0.6;
+        for (let i = 0; i < centers.length; i++) {
+            const current = Number.isFinite(centers[i]) ? centers[i] : (smoothed[i - 1] ?? (width / 2));
+            if (i === 0) {
+                smoothed.push(current);
+            } else {
+                const prev = smoothed[i - 1];
+                smoothed.push((prev * (1 - alpha)) + (current * alpha));
+            }
+        }
+        centers = smoothed;
+
+        const segments = buildCropSegments(
+            times,
+            centers,
+            Number(short.start_time),
+            Number(short.end_time),
+            cropWidth * 0.16,
+            0.9
+        );
+        if (!segments.length) {
+            return {
+                cropWidth,
+                cropHeight,
+                segments: [{
+                    start: Number(short.start_time),
+                    end: Number(short.end_time),
+                    cropX: clamp(Math.floor((width / 2) - (cropWidth / 2)), 0, Math.max(0, width - cropWidth))
+                }]
+            };
+        }
+
+        const withCropX = segments.map(seg => ({
+            ...seg,
+            cropX: clamp(Math.floor(seg.centerX - (cropWidth / 2)), 0, Math.max(0, width - cropWidth))
+        }));
+
+        return {
+            cropWidth,
+            cropHeight,
+            segments: withCropX
+        };
+    } finally {
+        if (tempDir) {
+            fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+    }
 }
 
 async function getVideoInfo(filePath) {
@@ -872,7 +1066,29 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
         });
 
         try {
-            await new Promise((resolve, reject) => {
+            const runFfmpeg = (args) => new Promise((resolve, reject) => {
+                const ffmpeg = spawn('ffmpeg', args);
+
+                let stderrOutput = '';
+                ffmpeg.stderr.on('data', (data) => {
+                    stderrOutput += data.toString();
+                });
+
+                ffmpeg.on('close', (code) => {
+                    if (code === 0) {
+                        resolve();
+                    } else {
+                        console.error(`[FFmpeg] Error:`, stderrOutput);
+                        reject(new Error(`FFmpeg exited with code ${code}`));
+                    }
+                });
+
+                ffmpeg.on('error', (err) => {
+                    reject(err);
+                });
+            });
+
+            const buildArgs = async (forceReencode = false) => {
                 const args = [
                     '-y',
                     '-ss', short.start_time.toString(),
@@ -880,9 +1096,51 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
                     '-t', duration.toString()
                 ];
 
-                if (portraitCrop && cropPlan && cropPlan.needsCrop) {
+                if (portraitCrop && cropPlan && cropPlan.needsCrop && !activeSpeakerCrop) {
                     args.push(
                         '-vf', `crop=${cropPlan.cropWidth}:${cropPlan.cropHeight}:${cropPlan.cropX}:0`,
+                        '-c:v', 'libx264',
+                        '-preset', 'fast',
+                        '-crf', '23',
+                        '-pix_fmt', 'yuv420p',
+                        '-c:a', 'aac'
+                    );
+                } else if (portraitCrop && activeSpeakerCrop) {
+                    const dynamicPlan = await buildDynamicCropPlan(videoPath, short, { activeSpeaker: true });
+                    if (dynamicPlan && dynamicPlan.segments && dynamicPlan.segments.length > 1) {
+                        const filter = buildDynamicCropFilter(dynamicPlan.segments, dynamicPlan.cropWidth, dynamicPlan.cropHeight);
+                        args.push(
+                            '-filter_complex', filter.filterComplex,
+                            ...filter.mapArgs,
+                            '-c:v', 'libx264',
+                            '-preset', 'fast',
+                            '-crf', '23',
+                            '-pix_fmt', 'yuv420p',
+                            '-c:a', 'aac'
+                        );
+                    } else if (dynamicPlan && dynamicPlan.segments && dynamicPlan.segments.length === 1) {
+                        const seg = dynamicPlan.segments[0];
+                        args.push(
+                            '-vf', `crop=${dynamicPlan.cropWidth}:${dynamicPlan.cropHeight}:${seg.cropX}:0`,
+                            '-c:v', 'libx264',
+                            '-preset', 'fast',
+                            '-crf', '23',
+                            '-pix_fmt', 'yuv420p',
+                            '-c:a', 'aac'
+                        );
+                    } else if (forceReencode) {
+                        args.push(
+                            '-c:v', 'libx264',
+                            '-preset', 'fast',
+                            '-crf', '23',
+                            '-pix_fmt', 'yuv420p',
+                            '-c:a', 'aac'
+                        );
+                    } else {
+                        args.push('-c', 'copy');
+                    }
+                } else if (forceReencode) {
+                    args.push(
                         '-c:v', 'libx264',
                         '-preset', 'fast',
                         '-crf', '23',
@@ -895,51 +1153,53 @@ ipcMain.handle('process:clipVideos', async (_event, { videoPath, outputDir, shor
 
                 args.push(
                     '-avoid_negative_ts', 'make_zero',
+                    '-max_muxing_queue_size', '1024',
                     clipPath
                 );
+                return args;
+            };
 
-                const ffmpeg = spawn('ffmpeg', args);
+            let lastError = null;
+            try {
+                const args = await buildArgs(false);
+                await runFfmpeg(args);
+                const { size } = fs.statSync(clipPath);
+                if (size < 1000) {
+                    throw new Error('Clip file too small (possible FFmpeg silent failure)');
+                }
+            } catch (err) {
+                lastError = err;
+            }
 
-                let stderrOutput = '';
-                ffmpeg.stderr.on('data', (data) => {
-                    stderrOutput += data.toString();
-                });
+            if (lastError) {
+                console.warn(`[FFmpeg] Retry with re-encode for "${short.title}"...`);
+                const args = await buildArgs(true);
+                await runFfmpeg(args);
+                const { size } = fs.statSync(clipPath);
+                if (size < 1000) {
+                    throw new Error('Clip file too small (even after re-encode)');
+                }
+            }
 
-                ffmpeg.on('close', (code) => {
-                    if (code === 0) {
-                        try {
-                            const { size } = fs.statSync(clipPath);
-                            if (size < 1000) {
-                                console.error(`[FFmpeg] Clip failed (File too small): ${clipPath}`);
-                                reject(new Error('Clip file too small (possible FFmpeg silent failure)'));
-                                return;
-                            }
-                            console.log(`[FFmpeg] Clip created: ${clipPath} (${size} bytes)`);
-                            resolve();
-                        } catch (err) {
-                            console.error(`[FFmpeg] Failed to stat output file:`, err);
-                            reject(err);
-                        }
-                    } else {
-                        console.error(`[FFmpeg] Error:`, stderrOutput);
-                        reject(new Error(`FFmpeg exited with code ${code}`));
-                    }
-                });
-
-                ffmpeg.on('error', (err) => {
-                    reject(err);
-                });
-            });
-
+            const clipKey = `${Number(short.start_time).toFixed(2)}-${Number(short.end_time).toFixed(2)}`;
             results.push({
+                index: i,
                 title: short.title,
+                start_time: short.start_time,
+                end_time: short.end_time,
+                clipKey,
                 clipPath: clipPath,
                 success: true
             });
         } catch (error) {
             console.error(`Failed to clip "${short.title}":`, error);
+            const clipKey = `${Number(short.start_time).toFixed(2)}-${Number(short.end_time).toFixed(2)}`;
             results.push({
+                index: i,
                 title: short.title,
+                start_time: short.start_time,
+                end_time: short.end_time,
+                clipKey,
                 clipPath: null,
                 success: false,
                 error: error.message

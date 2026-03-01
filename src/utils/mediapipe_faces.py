@@ -55,6 +55,7 @@ def main() -> int:
         return 2
 
     per_frame = []
+    per_frame_centers = []
     centers = []
     multi_face = False
     speaker_center_x = None
@@ -141,6 +142,10 @@ def main() -> int:
 
                 if detections:
                     frames_with_faces += 1
+                    best_in_frame = max(detections, key=lambda d: d["mouth_open"])
+                    per_frame_centers.append(float(best_in_frame["center"][0]))
+                else:
+                    per_frame_centers.append(None)
 
                 for det in detections:
                     track_id = _match_track(det["center"], image.width)
@@ -232,6 +237,13 @@ def main() -> int:
                         center_x = (best.xmin + (best.width / 2.0)) * float(image.width)
                         if np.isfinite(center_x):
                             centers.append(float(center_x))
+                            per_frame_centers.append(float(center_x))
+                        else:
+                            per_frame_centers.append(None)
+                    else:
+                        per_frame_centers.append(None)
+                else:
+                    per_frame_centers.append(None)
 
     avg_center_x = (sum(centers) / len(centers)) if centers else None
 
@@ -243,6 +255,7 @@ def main() -> int:
         "speaker_motion": speaker_motion,
         "speaker_frame_ratio": speaker_frame_ratio,
         "speaker_motion_ratio": speaker_motion_ratio,
+        "frame_centers": per_frame_centers,
         "frames": per_frame,
     }
     print(json.dumps(payload))

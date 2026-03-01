@@ -546,23 +546,21 @@ class ShortsAgent:
             self._apply_llm_title_reason_repairs(output, repair_targets)
 
         enriched: List[ShortClient] = []
-        for short in output.shorts:
+        for idx, short in enumerate(output.shorts):
             text = window_text(short.start_time, short.end_time) or nearest_segment_text(short.start_time)
             title_key = (short.title or "").strip().lower()
             repeated_title = title_key and title_counts.get(title_key, 0) > 1
             non_english = is_non_english_text(short.title or "") or is_non_english_text(short.reason or "")
-            if force_english or non_english:
-                if not short.title or is_generic_title(short.title) or repeated_title or non_english:
-                    short.title = "Key Moment"
-                if not short.reason or is_generic_reason(short.reason) or non_english:
+            if not short.title or is_generic_title(short.title) or repeated_title or non_english:
+                if text:
+                    short.title = make_title_from_text(text)
+                if not short.title:
+                    short.title = f"Clip {idx + 1}"
+            if not short.reason or is_generic_reason(short.reason) or non_english:
+                if text:
+                    short.reason = make_reason_from_text(text)
+                if not short.reason:
                     short.reason = "Highlights a clear, self-contained point from the segment."
-            else:
-                if not short.title or is_generic_title(short.title) or repeated_title:
-                    if text:
-                        short.title = make_title_from_text(text) or "Key Moment"
-                if not short.reason or is_generic_reason(short.reason):
-                    if text:
-                        short.reason = make_reason_from_text(text) or "Explores a clear, self-contained moment."
             enriched.append(short)
 
         return ShortsOutput(shorts=enriched, total_shorts=len(enriched))
@@ -666,6 +664,15 @@ class ShortsAgent:
         remaining = [c for c in candidates if c not in selected]
         remaining.sort(key=lambda s: s.score, reverse=True)
 
+        def too_similar(a: ShortClient, b: ShortClient) -> bool:
+            if abs(a.start_time - b.start_time) < 0.5 and abs(a.end_time - b.end_time) < 0.5:
+                return True
+            overlap_start = max(a.start_time, b.start_time)
+            overlap_end = min(a.end_time, b.end_time)
+            overlap = max(0.0, overlap_end - overlap_start)
+            dur = max(0.1, min(a.end_time - a.start_time, b.end_time - b.start_time))
+            return (overlap / dur) >= 0.85
+
         def far_enough(candidate: ShortClient) -> bool:
             c_mid = (candidate.start_time + candidate.end_time) / 2.0
             for s in selected:
@@ -678,6 +685,16 @@ class ShortsAgent:
             if len(selected) >= target_shorts:
                 break
             if far_enough(c):
+                selected.append(c)
+
+        # Second pass: if still short, allow lower-scored clips even if closer,
+        # but avoid near-duplicate windows.
+        if len(selected) < target_shorts:
+            for c in remaining:
+                if len(selected) >= target_shorts:
+                    break
+                if any(too_similar(c, s) for s in selected):
+                    continue
                 selected.append(c)
 
         selected.sort(key=lambda s: s.start_time)

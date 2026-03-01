@@ -403,7 +403,11 @@ function renderShortsList(shorts, clips = []) {
         const endTime = Number(short.end_time || 0);
         const duration = Math.max(0, endTime - startTime);
 
-        const clip = clips.find(c => c.title === short.title);
+        const clipKey = `${Number(startTime).toFixed(2)}-${Number(endTime).toFixed(2)}`;
+        const clip = clips.find(c => c.clipKey === clipKey)
+            || clips.find(c => c.index === index)
+            || clips[index]
+            || clips.find(c => c.title === short.title);
         const hasClip = clip && clip.success && clip.clipPath;
 
         const formatTime = (secs) => {
